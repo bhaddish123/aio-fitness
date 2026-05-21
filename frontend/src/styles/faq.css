@@ -1,0 +1,130 @@
+.faq-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 32px 80px;
+}
+
+.faq-page h1 {
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin-bottom: 48px;
+  text-align: center;
+  background: linear-gradient(135deg, var(--gray-900) 0%, var(--blue) 60%, var(--purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.faq-item {
+  border: 1px solid rgba(30, 95, 229, 0.12);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease;
+}
+
+.faq-item:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.faq-question {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gray-900);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color var(--transition);
+}
+
+.faq-question:hover {
+  background-color: var(--blue-light);
+}
+
+.faq-question span:last-child {
+  font-size: 22px;
+  font-weight: 400;
+  background: var(--gradient-blue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  flex-shrink: 0;
+  margin-left: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Open state */
+.faq-item:has(.faq-body-open) {
+  border-color: rgba(30, 95, 229, 0.22);
+  box-shadow: 0 4px 20px rgba(30, 95, 229, 0.08);
+}
+
+.faq-item:has(.faq-body-open) .faq-question {
+  background-color: var(--blue-light);
+}
+
+.faq-item:has(.faq-body-open) .faq-question span:last-child {
+  transform: rotate(45deg) scale(1.1);
+}
+
+/* Smooth accordion using CSS grid trick */
+.faq-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.faq-body.faq-body-open {
+  grid-template-rows: 1fr;
+}
+
+.faq-body-inner {
+  overflow: hidden;
+}
+
+.faq-answer {
+  padding: 0 24px 18px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.faq-answer p {
+  font-size: 15px;
+  color: var(--gray-600);
+  line-height: 1.7;
+  padding-top: 14px;
+}
+
+/* Stagger FAQ items on page load */
+.faq-list .faq-item {
+  animation: fadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+.faq-list .faq-item:nth-child(1)  { animation-delay: 0.05s; }
+.faq-list .faq-item:nth-child(2)  { animation-delay: 0.12s; }
+.faq-list .faq-item:nth-child(3)  { animation-delay: 0.19s; }
+.faq-list .faq-item:nth-child(4)  { animation-delay: 0.26s; }
+.faq-list .faq-item:nth-child(5)  { animation-delay: 0.33s; }
+.faq-list .faq-item:nth-child(6)  { animation-delay: 0.40s; }
+.faq-list .faq-item:nth-child(7)  { animation-delay: 0.47s; }
+.faq-list .faq-item:nth-child(8)  { animation-delay: 0.54s; }

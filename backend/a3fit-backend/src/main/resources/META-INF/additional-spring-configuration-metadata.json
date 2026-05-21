@@ -1,0 +1,39 @@
+{
+  "properties": [
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "Secret key used to sign JWT tokens."
+    },
+    {
+      "name": "jwt.expiration",
+      "type": "java.lang.Long",
+      "description": "JWT token expiration time in milliseconds."
+    },
+    {
+      "name": "stripe.api.key",
+      "type": "java.lang.String",
+      "description": "Stripe secret API key."
+    },
+    {
+      "name": "stripe.webhook.secret",
+      "type": "java.lang.String",
+      "description": "Stripe webhook signing secret."
+    },
+    {
+      "name": "admin.username",
+      "type": "java.lang.String",
+      "description": "Admin login username."
+    },
+    {
+      "name": "admin.password",
+      "type": "java.lang.String",
+      "description": "Admin login password."
+    },
+    {
+      "name": "app.base-url",
+      "type": "java.lang.String",
+      "description": "Base URL of the frontend application."
+    }
+  ]
+}

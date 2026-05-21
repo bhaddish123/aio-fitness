@@ -1,0 +1,35 @@
+
+# Environment / secrets — never commit these
+.env
+*.env
+.env.local
+.env.production
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.DS_Store
+
+# Backend
+backend/**/target/
+backend/**/*.class
+backend/**/.mvn/wrapper/maven-wrapper.jar
+backend/**/application-local.yml
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.suo
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
