@@ -17,6 +17,9 @@ backend/**/*.class
 backend/**/.mvn/wrapper/maven-wrapper.jar
 backend/**/application-local.yml
 
+# Claude Code
+.claude/
+
 # IDE
 .idea/
 *.iml
