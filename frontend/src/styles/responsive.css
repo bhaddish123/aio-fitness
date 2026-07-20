@@ -5,59 +5,15 @@
   }
 
   .testimonials-preview,
-  .about-preview,
-  .faq-preview,
-  .contact-info {
-    padding-top: 64px;
-    padding-bottom: 64px;
+  .faq-preview {
+    padding-top: 88px;
+    padding-bottom: 88px;
   }
 }
 
 @media (max-width: 768px) {
-  .nav-container {
-    padding: 0 20px;
-    position: relative;
-  }
-
-  .nav-hamburger {
-    display: flex;
-  }
-
-  .nav-links {
-    display: none;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    right: 0;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--gray-200);
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-    padding: 8px 0 16px;
-    box-shadow: var(--shadow-md);
-  }
-
-  .nav-links.nav-links-open {
-    display: flex;
-  }
-
-  .nav-links a,
-  .nav-links button {
-    font-size: 16px;
-    padding: 14px 24px;
-    width: 100%;
-    border-bottom: none;
-  }
-
-  .nav-links a::after {
-    display: none;
-  }
-
-  .hero {
-    padding: 100px 20px 80px;
-  }
+  /* Nav mobile dropdown, hero typography, and footer responsive rules
+     live in navigation.css / home.css / footer.css — not duplicated here. */
 
   .testimonials-grid {
     grid-template-columns: 1fr;
@@ -67,30 +23,15 @@
   }
 
   .testimonials-preview,
-  .about-preview,
-  .faq-preview,
-  .contact-info {
-    padding-top: 48px;
-    padding-bottom: 48px;
-  }
-
-  .hero h1 {
-    font-size: 36px;
-    letter-spacing: -1px;
-  }
-
-  .hero p {
-    font-size: 17px;
+  .faq-preview {
+    padding-top: 64px;
+    padding-bottom: 64px;
   }
 
   .about-hero {
     grid-template-columns: 1fr;
     gap: 32px;
     padding: 48px 0 32px;
-  }
-
-  .about-intro h1 {
-    font-size: 32px;
   }
 
   .booking-page,
@@ -106,20 +47,9 @@
   }
 
   .testimonials-preview,
-  .about-preview,
-  .faq-preview,
-  .contact-info {
+  .faq-preview {
     padding-left: 20px;
     padding-right: 20px;
-  }
-
-  .footer {
-    padding: 44px 20px 32px;
-  }
-
-  .footer-container {
-    grid-template-columns: 1fr;
-    gap: 28px;
   }
 
   .dashboard-stats {
@@ -168,14 +98,6 @@
 }
 
 @media (max-width: 480px) {
-  .nav-links {
-    gap: 12px;
-  }
-
-  .dashboard-stats {
-    grid-template-columns: 1fr;
-  }
-
   .philosophy-points {
     grid-template-columns: 1fr;
   }

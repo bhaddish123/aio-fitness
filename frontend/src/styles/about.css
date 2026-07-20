@@ -4,19 +4,67 @@
   padding: 0 32px;
 }
 
+/* Full-bleed split hero — breaks out of .about's centered max-width
+   to span the whole viewport, and bleeds up under the fixed
+   transparent nav the same way the Home hero does. */
 .about-hero {
+  position: relative;
+  /* Break out of .about's 32px side padding to reach the viewport edge
+     without using 100vw (which includes scrollbar width and triggers a
+     horizontal scrollbar on Windows / Linux). */
+  width: calc(100% + 64px);
+  margin-left: -32px;
+  margin-right: -32px;
+  margin-top: -80px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 64px;
-  align-items: center;
-  padding: 80px 0 64px;
+  grid-template-rows: minmax(720px, auto);
+  gap: 0;
+}
+
+.about-hero-image {
+  position: relative;
+  overflow: hidden;
+  background: var(--gray-50);
+}
+
+/* Peekaboo reveal — same mechanic as Home's "Train With Everett" panel.
+   Photo starts nudged behind the left edge and slightly zoomed; a solid
+   curtain fully covers it until the hero scrolls into view, then both
+   release together (curtain slides fully off, photo settles into place). */
+.about-hero-photo-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateX(-8%) scale(1.06);
+  transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+  will-change: transform;
+}
+
+.about-hero.in-view .about-hero-photo-layer {
+  transform: translateX(0) scale(1);
+}
+
+.about-hero-cover {
+  position: absolute;
+  inset: 0;
+  background: var(--navy-mid);
+  border-right: 3px solid var(--blue);
+  transform: translateX(0);
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  z-index: 1;
+}
+
+.about-hero.in-view .about-hero-cover {
+  transform: translateX(100%);
 }
 
 .image-placeholder {
+  position: absolute;
+  inset: 0;
   background-color: var(--gray-100);
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius);
-  height: 360px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,28 +72,66 @@
   font-size: 14px;
 }
 
-.about-intro h1 {
-  font-size: clamp(36px, 4vw, 52px);
-  font-weight: 900;
-  letter-spacing: -1px;
-  margin-bottom: 20px;
-  background: linear-gradient(135deg, var(--gray-900) 0%, var(--blue) 60%, var(--purple) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.about-intro {
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px 80px;
 }
 
-.about-intro p {
-  font-size: 18px;
-  color: var(--gray-600);
+/* Counter-parallax "lag" — drifts down and fades in slower than the
+   image's reveal as the hero scrolls through. Static fallback (no
+   offset, full opacity) whenever the scroll handler doesn't run. */
+.about-intro-lag {
+  opacity: 1;
+  will-change: transform, opacity;
+}
+
+.about-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 18px;
+}
+
+.about-intro h1 {
+  font-size: clamp(40px, 5.5vw, 72px);
+  color: #ffffff;
+  margin: 0 0 28px;
+}
+
+.about-bio {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.75);
   line-height: 1.7;
+  max-width: 480px;
+}
+
+@media (max-width: 768px) {
+  .about-hero {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    margin-top: -64px;
+  }
+
+  .about-hero-image {
+    height: 360px;
+  }
+
+  .about-intro {
+    padding: 48px 24px;
+  }
 }
 
 .my-journey,
 .training-philosophy,
 .client-testimonials,
 .about-cta {
-  padding: 56px 0;
+  padding: 96px 0;
   border-top: 1px solid var(--gray-200);
 }
 
@@ -55,8 +141,8 @@
 .about-cta h2 {
   font-size: 32px;
   font-weight: 800;
-  letter-spacing: -0.5px;
-  margin-bottom: 24px;
+  letter-spacing: 0.05em;
+  margin-bottom: 2rem;
 }
 
 .my-journey p {
@@ -75,40 +161,30 @@
 }
 
 .philosophy-item {
-  background: var(--white);
+  background: var(--gradient-section);
   border: 1px solid var(--gray-200);
-  border-top: 3px solid transparent;
+  border-top: 3px solid var(--blue);
   border-radius: var(--radius);
   padding: 28px;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.25s ease, box-shadow 0.25s ease;
   position: relative;
   overflow: hidden;
 }
 
-.philosophy-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--gradient-blue);
-}
-
 .philosophy-item:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
+  background-color: var(--blue-light);
 }
 
 .philosophy-item h3 {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   margin-bottom: 10px;
-  background: var(--gradient-blue);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--blue);
 }
 
 .philosophy-item p {
@@ -122,9 +198,10 @@
 }
 
 .trainer-photo {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 360px;
+  height: 100%;
   object-fit: cover;
-  border-radius: var(--radius);
   display: block;
 }

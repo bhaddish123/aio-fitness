@@ -27,7 +27,7 @@ export default function Dashboard() {
 
   return (
     <main className="admin-dashboard">
-      <h1>Admin Dashboard</h1>
+      <h1>Admin <span>Dashboard</span></h1>
 
       <section className="dashboard-stats">
         <div className="stat-card">

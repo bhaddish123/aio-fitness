@@ -1,38 +1,40 @@
 .faq-page {
   max-width: 720px;
   margin: 0 auto;
-  padding: 64px 32px 80px;
+  padding: 96px 32px 100px;
 }
 
 .faq-page h1 {
-  font-size: clamp(32px, 5vw, 48px);
-  font-weight: 900;
-  letter-spacing: -1px;
-  margin-bottom: 48px;
+  font-size: clamp(32px, 5vw, 52px);
+  margin-bottom: 56px;
   text-align: center;
-  background: linear-gradient(135deg, var(--gray-900) 0%, var(--blue) 60%, var(--purple) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--gray-900);
+}
+
+.faq-page h1 span {
+  color: var(--blue);
 }
 
 .faq-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 14px;
 }
 
 .faq-item {
-  border: 1px solid rgba(30, 95, 229, 0.12);
+  border: 1px solid var(--gray-200);
+  border-left: 3px solid transparent;
   border-radius: var(--radius);
   overflow: hidden;
-  background: var(--white);
+  background: var(--gradient-section);
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s ease;
+  transition: border-left-color 0.2s ease, box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 .faq-item:hover {
-  box-shadow: var(--shadow-md);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
+  border-left-color: var(--blue);
 }
 
 .faq-question {
@@ -56,12 +58,9 @@
 }
 
 .faq-question span:last-child {
-  font-size: 22px;
-  font-weight: 400;
-  background: var(--gradient-blue);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--blue);
   flex-shrink: 0;
   margin-left: 16px;
   display: inline-flex;
@@ -70,13 +69,12 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  transition: background-color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s ease;
 }
 
 /* Open state */
 .faq-item:has(.faq-body-open) {
-  border-color: rgba(30, 95, 229, 0.22);
-  box-shadow: 0 4px 20px rgba(30, 95, 229, 0.08);
+  border-left-color: var(--blue);
 }
 
 .faq-item:has(.faq-body-open) .faq-question {
@@ -114,17 +112,25 @@
   padding-top: 14px;
 }
 
-/* Stagger FAQ items on page load */
-.faq-list .faq-item {
-  animation: fadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
-  will-change: transform, opacity;
+/* Quick entrance on page load. Smaller travel distance (12px, vs the
+   site-wide fadeInUp's 32px) plus a short duration and a barely-there
+   stagger — the whole list settles in well under 0.3s total. The
+   previous pass (0.3s duration / 0.03s steps, ~0.5s total) still read
+   as lag, so this trims both the distance and the timing further. */
+@keyframes faqItemIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.faq-list .faq-item:nth-child(1)  { animation-delay: 0.05s; }
-.faq-list .faq-item:nth-child(2)  { animation-delay: 0.12s; }
-.faq-list .faq-item:nth-child(3)  { animation-delay: 0.19s; }
-.faq-list .faq-item:nth-child(4)  { animation-delay: 0.26s; }
-.faq-list .faq-item:nth-child(5)  { animation-delay: 0.33s; }
-.faq-list .faq-item:nth-child(6)  { animation-delay: 0.40s; }
-.faq-list .faq-item:nth-child(7)  { animation-delay: 0.47s; }
-.faq-list .faq-item:nth-child(8)  { animation-delay: 0.54s; }
+.faq-list .faq-item {
+  animation: faqItemIn 0.18s ease-out both;
+  will-change: transform, opacity;
+}
+.faq-list .faq-item:nth-child(1) { animation-delay: 0s; }
+.faq-list .faq-item:nth-child(2) { animation-delay: 0.015s; }
+.faq-list .faq-item:nth-child(3) { animation-delay: 0.03s; }
+.faq-list .faq-item:nth-child(4) { animation-delay: 0.045s; }
+.faq-list .faq-item:nth-child(5) { animation-delay: 0.06s; }
+.faq-list .faq-item:nth-child(6) { animation-delay: 0.075s; }
+.faq-list .faq-item:nth-child(7) { animation-delay: 0.09s; }
+.faq-list .faq-item:nth-child(8) { animation-delay: 0.105s; }

@@ -1,0 +1,67 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        "[format_sql]": true
+  sql:
+    init:
+      mode: never
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+stripe:
+  api:
+    key: ${STRIPE_API_KEY}
+  webhook:
+    secret: ${STRIPE_WEBHOOK_SECRET:dummy_test_secret}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000
+
+admin:
+  username: ${ADMIN_USERNAME}
+  password: ${ADMIN_PASSWORD}
+
+app:
+  base-url: ${APP_BASE_URL:http://localhost:5173}
+
+notify:
+  email: ${NOTIFY_EMAIL:everettleefitness@gmail.com}
+
+google:
+  calendar:
+    # The calendar to create/cancel session events on — typically Everett's
+    # own Google account email, once he's shared "Make changes to events"
+    # access with the service account below.
+    id: ${GOOGLE_CALENDAR_ID:}
+    # Full contents of the service account JSON key file (not a file path) —
+    # paste the whole JSON as a single-line env var. Left blank, calendar
+    # sync is skipped entirely (booking flow is unaffected either way).
+    credentials-json: ${GOOGLE_CALENDAR_CREDENTIALS_JSON:}
+
+server:
+  port: 8080
+  tomcat:
+    max-http-form-post-size: 15MB
+    max-swallow-size: 15MB

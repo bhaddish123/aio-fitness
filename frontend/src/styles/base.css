@@ -8,15 +8,41 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  /* hidden on html is the reliable cross-browser way to kill the
+     horizontal scrollbar; clip on body beneath it handles edge cases
+     where a child escapes body's scroll context. */
+  overflow-x: hidden;
+  /* Firefox slim scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(180, 148, 48, 0.3) rgba(255, 255, 255, 0.04);
 }
+
+/* Chromium / Safari slim scrollbar — 5px, dark track, muted-gold thumb */
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: rgba(255, 255, 255, 0.03); }
+::-webkit-scrollbar-thumb  { background: rgba(180, 148, 48, 0.32); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(212, 175, 55, 0.5); }
+::-webkit-scrollbar-corner { background: transparent; }
 
 body {
   font-family: var(--font);
-  background-color: var(--white);
+  background-color: var(--navy);
   color: var(--gray-900);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+  width: 100%;
+  /* Nav is fixed/transparent and no longer takes up flow space —
+     this replaces that space so page content isn't hidden under it.
+     .home opts out (see home.css) so its hero can bleed to the top. */
+  padding-top: 80px;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 64px;
+  }
 }
 
 a {
@@ -48,9 +74,31 @@ input, select, textarea {
 }
 
 h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
   font-weight: 700;
   line-height: 1.2;
   color: var(--gray-900);
+  letter-spacing: -0.01em;
+}
+
+h1, h2 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+/* Consistent rhythm under every section header — page-specific
+   selectors below only override this where a heading is tightly
+   paired with a sub-line directly beneath it (e.g. a byline), not
+   for ordinary section headers. Letter-spacing opens up (vs. h1's
+   tight -0.02em) so H2s read as a distinct, airier tier. */
+h2 {
+  margin-bottom: 2rem;
+  letter-spacing: 0.05em;
+}
+
+p {
+  font-weight: 400;
 }
 
 *:focus-visible {
@@ -61,41 +109,46 @@ h1, h2, h3, h4, h5, h6 {
 /* Shared Utilities */
 .cta-button {
   display: inline-block;
-  background: var(--gradient-blue);
-  color: var(--white);
-  font-size: 17px;
-  font-weight: 600;
-  padding: 14px 36px;
-  border-radius: 980px;
-  border: none;
+  /* Polished-gold gradient + specular streak — the same material
+     language as the logo, reserved for the primary CTA only. */
+  background: var(--gloss-streak), var(--gloss-metal);
+  color: var(--navy);
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 1rem 2rem;
+  border-radius: var(--radius);
+  border: 2px solid var(--blue);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   text-decoration: none;
   box-shadow: var(--shadow-blue);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.06em;
 }
 
 .cta-button:hover {
-  transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 10px 32px rgba(30, 95, 229, 0.42);
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0) 62%, rgba(255, 255, 255, 0.04) 100%), var(--navy);
+  color: var(--blue);
+  transform: scale(1.08) translateY(-3px);
+  box-shadow: var(--glow-gold);
   text-decoration: none;
-  color: var(--white);
 }
 
 .cta-button:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: var(--shadow-blue);
+  transform: scale(1.03) translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .cta-button.pulse {
-  animation: ctaPulse 2.8s ease-in-out infinite;
+  animation: none;
 }
 
 .error-message {
   background-color: var(--red-light);
   color: var(--red);
-  border: 1px solid #ffcccc;
-  border-radius: var(--radius-sm);
+  border: 2px solid var(--red);
+  border-radius: 0;
   padding: 12px 16px;
   font-size: 14px;
   margin: 12px 0;
@@ -151,7 +204,7 @@ h1, h2, h3, h4, h5, h6 {
 .form-group textarea:focus {
   outline: none;
   border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(30, 95, 229, 0.12);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
   background-color: var(--white);
 }
 

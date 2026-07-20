@@ -1,0 +1,37 @@
+.sticky-social-sidebar {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sticky-social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  transition: color 0.15s linear;
+}
+
+.sticky-social-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.sticky-social-icon:hover {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .sticky-social-sidebar {
+    display: none;
+  }
+}

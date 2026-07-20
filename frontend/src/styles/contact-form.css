@@ -1,0 +1,229 @@
+/* ─── Contact form section — split-column layout: brand details on
+   the left, an inline contact form on the right. Replaces the old
+   plain "Get in Touch" text panel that duplicated footer content. */
+.contact-form-section {
+  background: var(--navy);
+  border-top: 1px solid var(--gray-200);
+  padding: 96px 32px;
+}
+
+.contact-form-grid {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+}
+
+/* ─── Left — heading, contact details, socials ──────────────────── */
+.contact-form-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.contact-form-heading {
+  font-size: clamp(28px, 3.5vw, 40px);
+  color: #ffffff;
+  margin: 0 0 32px;
+}
+
+.contact-form-name {
+  font-size: clamp(28px, 3.5vw, 40px);
+  color: #ffffff;
+  margin: 0 0 6px;
+}
+
+.contact-form-role {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 28px;
+}
+
+.contact-form-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.contact-form-details a,
+.contact-form-details span {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.contact-form-details a:hover {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.contact-form-socials {
+  display: flex;
+}
+
+/* Bare glyphs, no background — this row already sits inside a card
+   on a solid background, so it doesn't need the sticky sidebar's
+   glass-capsule treatment. Hover stays color-only for the same calm,
+   restrained feel as .sticky-social-icon. */
+.contact-form-social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.15s linear;
+}
+
+.contact-form-social-btn svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.contact-form-social-btn:hover {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+/* ─── Right — form ───────────────────────────────────────────────
+   Boxed inputs with full borders, label-above layout. */
+.contact-form-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-form-field label {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.cf-required {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.contact-form-field input,
+.contact-form-field textarea {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-family: var(--font);
+  font-size: 15px;
+  padding: 18px 20px;
+  resize: none;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.contact-form-field input:focus,
+.contact-form-field textarea:focus {
+  outline: none;
+  background-color: rgba(212, 175, 55, 0.14);
+}
+
+.contact-form-field textarea {
+  min-height: 110px;
+}
+
+.contact-form-phone {
+  display: flex;
+  align-items: stretch;
+  background-color: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.contact-form-phone:focus-within {
+  background-color: rgba(212, 175, 55, 0.14);
+}
+
+.contact-form-phone-prefix {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 92px;
+  padding: 0 28px 0 12px;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Real, functioning dial-code picker — sized to fill the whole prefix
+   box (chevron included), so clicking the arrow itself opens it too,
+   not just the flag/code text next to it. appearance:none strips the
+   native select chrome since the chevron icon already signals "opens
+   a menu"; it's still a genuine <select> underneath (keyboard/screen-
+   reader operable). */
+.contact-form-phone-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0 28px 0 12px;
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: var(--font);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.contact-form-phone-prefix svg {
+  position: relative;
+  margin-left: auto;
+  /* Purely visual — clicks pass through to the <select> beneath. */
+  pointer-events: none;
+}
+
+.contact-form-phone-select option {
+  color: var(--navy);
+}
+
+.contact-form-phone input {
+  background: transparent;
+  border: none;
+  flex: 1;
+  min-width: 0;
+}
+
+.contact-form-submit-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .contact-form-section {
+    padding: 96px 24px;
+  }
+
+  .contact-form-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .contact-form-submit {
+    width: 100%;
+  }
+}

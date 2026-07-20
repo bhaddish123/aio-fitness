@@ -27,12 +27,32 @@
 
 @keyframes ctaPulse {
   0%, 100% { box-shadow: var(--shadow-blue); }
-  50%       { box-shadow: 0 6px 32px rgba(30, 95, 229, 0.45); }
+  50%       { box-shadow: 0 6px 32px rgba(212, 175, 55, 0.45); }
 }
 
 @keyframes modal-in {
   from { opacity: 0; transform: translateY(16px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+@keyframes slideDownFadeIn {
+  from { opacity: 0; transform: translateY(-30px); }
+  to   { opacity: 1; transform: translateY(0);      }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0);    }
+  50%      { transform: translateY(-10px); }
+}
+
+@keyframes headingPop {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1);     }
 }
 
 .animate-fade-in-up {
@@ -59,3 +79,25 @@
 .animate-fade-in-up.in-view.delay-4 { animation-delay: 0.32s; }
 .animate-fade-in-up.in-view.delay-5 { animation-delay: 0.40s; }
 .animate-fade-in-up.in-view.delay-6 { animation-delay: 0.48s; }
+
+/* Section headings — fade + slight scale pop, piggybacks on the
+   parent section's existing .in-view toggle, no extra JS needed. */
+.heading-pop {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.in-view .heading-pop {
+  animation: headingPop 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Respect reduced-motion: kill decorative animation/transition,
+   keep instant state changes (e.g. accordion open/close still works). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

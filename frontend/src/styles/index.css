@@ -1,5 +1,5 @@
 /* ============================================================
-   A3 FITNESS — DESIGN SYSTEM
+   AIO FITNESS — DESIGN SYSTEM
    ============================================================ */
 
 @import './variables.css';
@@ -7,7 +7,12 @@
 @import './animations.css';
 @import './navigation.css';
 @import './footer.css';
+@import './sticky-social-sidebar.css';
+@import './scroll-to-top.css';
+@import './contact-form.css';
 @import './home.css';
+@import './coaching.css';
+@import './coaching-apply.css';
 @import './about.css';
 @import './faq.css';
 @import './booking.css';

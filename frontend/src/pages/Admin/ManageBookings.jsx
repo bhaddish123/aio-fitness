@@ -2,9 +2,22 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import bookingService from '../../services/bookingService';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { BOOKING_STATUS } from '../../utils/constants';
+import { BOOKING_STATUS, SEX_OPTIONS, EXPERIENCE_LEVEL_OPTIONS, HELP_NEEDED_OPTIONS } from '../../utils/constants';
 
 const PAGE_SIZE = 10;
+
+const labelFor = (options, value) => options.find((o) => o.value === value)?.label || value;
+
+const formatHelpNeeded = (booking) => {
+  if (!booking.helpNeeded?.length) return '—';
+  const labels = booking.helpNeeded
+    .filter((v) => v !== 'OTHER')
+    .map((v) => labelFor(HELP_NEEDED_OPTIONS, v));
+  if (booking.helpNeeded.includes('OTHER')) {
+    labels.push(booking.helpNeededOther ? `Other: ${booking.helpNeededOther}` : 'Other');
+  }
+  return labels.join(', ');
+};
 
 export default function ManageBookings() {
   const [bookings, setBookings] = useState([]);
@@ -56,10 +69,11 @@ export default function ManageBookings() {
   return (
     <main className="manage-bookings">
       <Link to="/admin/dashboard" style={{ fontSize: 14, color: 'var(--blue)', textDecoration: 'none', display: 'inline-block', marginBottom: 16 }}>← Back</Link>
-      <h1>Manage Bookings</h1>
+      <h1>Manage <span>Bookings</span></h1>
 
       {actionError && <p className="error-message">{actionError}</p>}
 
+      <div className="table-scroll">
       <table className="bookings-table">
         <thead>
           <tr>
@@ -113,6 +127,7 @@ export default function ManageBookings() {
           ))}
         </tbody>
       </table>
+      </div>
 
       {totalPages > 1 && (
         <div className="pagination">
@@ -144,6 +159,33 @@ export default function ManageBookings() {
 
               <span className="detail-label">Status</span>
               <span>{selectedBooking.status}</span>
+
+              <span className="detail-section-heading">Fitness Intake</span>
+
+              <span className="detail-label">Age</span>
+              <span>{selectedBooking.age ?? '—'}</span>
+
+              <span className="detail-label">Sex</span>
+              <span>{selectedBooking.sex ? labelFor(SEX_OPTIONS, selectedBooking.sex) : '—'}</span>
+
+              <span className="detail-label">Gym Set Up</span>
+              <span>{selectedBooking.gymSetup || '—'}</span>
+
+              <span className="detail-label">Weekly Commitment</span>
+              <span>
+                {selectedBooking.weeklyCommitmentDays
+                  ? `${selectedBooking.weeklyCommitmentDays} day${selectedBooking.weeklyCommitmentDays > 1 ? 's' : ''}/week`
+                  : '—'}
+              </span>
+
+              <span className="detail-label">Experience</span>
+              <span>{selectedBooking.experienceLevel ? labelFor(EXPERIENCE_LEVEL_OPTIONS, selectedBooking.experienceLevel) : '—'}</span>
+
+              <span className="detail-label">Goals</span>
+              <span>{selectedBooking.goals || '—'}</span>
+
+              <span className="detail-label">Help Needed</span>
+              <span>{formatHelpNeeded(selectedBooking)}</span>
 
               <span className="detail-label">Waiver</span>
               <span>{selectedBooking.waiverAccepted ? 'Accepted' : 'Not accepted'}</span>

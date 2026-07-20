@@ -46,8 +46,19 @@ export default function ManageContent() {
   const [heroPhotoPreview, setHeroPhotoPreview] = useState('');
   const [savingHeroPhoto, setSavingHeroPhoto]   = useState(false);
 
-  // Crop modal — shared by both photo uploaders
-  const [cropTarget, setCropTarget]             = useState(null); // 'about' | 'hero'
+  // "Train with Everett" focus panel photo (home page) — separate
+  // image/content key from the About page photo so the two sections
+  // can show different photos.
+  const [focusPhoto, setFocusPhoto]               = useState('');
+  const [focusPhotoPreview, setFocusPhotoPreview] = useState('');
+  const [savingFocusPhoto, setSavingFocusPhoto]   = useState(false);
+
+  // Hero video (replaces the hero photo as the home page background when set)
+  const [heroVideo, setHeroVideo]               = useState('');
+  const [savingHeroVideo, setSavingHeroVideo]   = useState(false);
+
+  // Crop modal — shared by all photo uploaders
+  const [cropTarget, setCropTarget]             = useState(null); // 'about' | 'hero' | 'focus'
   const [cropSrc, setCropSrc]                   = useState(null);
   const [crop, setCrop]                         = useState({ x: 0, y: 0 });
   const [zoom, setZoom]                         = useState(1);
@@ -77,6 +88,8 @@ export default function ManageContent() {
         if (data['about.bio'])    setBio(data['about.bio']);
         if (data['about.photo']) { setPhoto(data['about.photo']); setPhotoPreview(data['about.photo']); }
         if (data['hero.photo'])  { setHeroPhoto(data['hero.photo']); setHeroPhotoPreview(data['hero.photo']); }
+        if (data['hero.video'])  setHeroVideo(data['hero.video']);
+        if (data['home.focusPhoto']) { setFocusPhoto(data['home.focusPhoto']); setFocusPhotoPreview(data['home.focusPhoto']); }
         if (data.testimonials) {
           try { setTestimonials(JSON.parse(data.testimonials)); } catch {}
         }
@@ -119,6 +132,9 @@ export default function ManageContent() {
       if (cropTarget === 'hero') {
         setHeroPhoto(cropped);
         setHeroPhotoPreview(cropped);
+      } else if (cropTarget === 'focus') {
+        setFocusPhoto(cropped);
+        setFocusPhotoPreview(cropped);
       } else {
         setPhoto(cropped);
         setPhotoPreview(cropped);
@@ -147,7 +163,7 @@ export default function ManageContent() {
     setSavingHeroPhoto(true);
     try {
       await contentService.updateContent('hero.photo', heroPhoto);
-      localStorage.setItem('a3fit_hero_photo', heroPhoto);
+      localStorage.setItem('aio_fitness_hero_photo', heroPhoto);
       showToast('Hero photo saved.');
     } catch {
       showToast('Failed to save hero photo.', 'error');
@@ -160,7 +176,7 @@ export default function ManageContent() {
     if (!window.confirm('Remove the hero photo? The home page will revert to its default gradient background.')) return;
     try {
       await contentService.deleteContent('hero.photo');
-      localStorage.removeItem('a3fit_hero_photo');
+      localStorage.removeItem('aio_fitness_hero_photo');
       setHeroPhoto('');
       setHeroPhotoPreview('');
       showToast('Hero photo removed.');
@@ -169,11 +185,81 @@ export default function ManageContent() {
     }
   };
 
+  const saveFocusPhoto = async () => {
+    if (!focusPhoto) return;
+    setSavingFocusPhoto(true);
+    try {
+      await contentService.updateContent('home.focusPhoto', focusPhoto);
+      localStorage.setItem('aio_fitness_focus_photo', focusPhoto);
+      showToast('Train with Everett photo saved.');
+    } catch {
+      showToast('Failed to save photo.', 'error');
+    } finally {
+      setSavingFocusPhoto(false);
+    }
+  };
+
+  const deleteFocusPhoto = async () => {
+    if (!window.confirm('Remove the "Train with Everett" photo? The home page section will revert to its default background.')) return;
+    try {
+      await contentService.deleteContent('home.focusPhoto');
+      localStorage.removeItem('aio_fitness_focus_photo');
+      setFocusPhoto('');
+      setFocusPhotoPreview('');
+      showToast('Photo removed.');
+    } catch (err) {
+      showToast(err?.response?.data?.error || err?.message || 'Failed to remove photo.', 'error');
+    }
+  };
+
+  /* ── Hero video ───────────────────────────────────────────── */
+
+  const MAX_VIDEO_BYTES = 8 * 1024 * 1024; // 8MB — kept small since it's inlined as base64 in the /content payload
+
+  const onHeroVideoSelected = (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    if (file.size > MAX_VIDEO_BYTES) {
+      showToast('Video must be under 8MB. Please compress it and try again.', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setHeroVideo(reader.result);
+    reader.readAsDataURL(file);
+  };
+
+  const saveHeroVideo = async () => {
+    if (!heroVideo) return;
+    setSavingHeroVideo(true);
+    try {
+      await contentService.updateContent('hero.video', heroVideo);
+      localStorage.setItem('aio_fitness_hero_video', heroVideo);
+      showToast('Hero video saved.');
+    } catch {
+      showToast('Failed to save hero video.', 'error');
+    } finally {
+      setSavingHeroVideo(false);
+    }
+  };
+
+  const deleteHeroVideo = async () => {
+    if (!window.confirm('Remove the hero video? The home page will revert to the hero photo or default background.')) return;
+    try {
+      await contentService.deleteContent('hero.video');
+      localStorage.removeItem('aio_fitness_hero_video');
+      setHeroVideo('');
+      showToast('Hero video removed.');
+    } catch (err) {
+      showToast(err?.response?.data?.error || err?.message || 'Failed to remove hero video.', 'error');
+    }
+  };
+
   const deleteAboutPhoto = async () => {
     if (!window.confirm('Remove the about photo? The About page will show no trainer photo.')) return;
     try {
       await contentService.deleteContent('about.photo');
-      localStorage.removeItem('a3fit_trainer_photo');
+      localStorage.removeItem('aio_fitness_trainer_photo');
       setPhoto('');
       setPhotoPreview('');
       showToast('About photo removed.');
@@ -275,7 +361,7 @@ export default function ManageContent() {
   return (
     <main className="manage-content">
       <Link to="/admin/dashboard" style={{ fontSize: 14, color: 'var(--blue)', textDecoration: 'none', display: 'inline-block', marginBottom: 16 }}>← Back</Link>
-      <h1>Manage Content</h1>
+      <h1>Manage <span>Content</span></h1>
 
       {fetchError && <p className="error-message">{fetchError}</p>}
 
@@ -299,7 +385,7 @@ export default function ManageContent() {
       {cropSrc && (
         <div className="modal-overlay" onClick={resetCrop}>
           <div className="modal-card crop-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>{cropTarget === 'hero' ? 'Crop Hero Photo' : 'Crop About Photo'}</h2>
+            <h2>{cropTarget === 'hero' ? 'Crop Hero Photo' : cropTarget === 'focus' ? 'Crop Train with Everett Photo' : 'Crop About Photo'}</h2>
 
             {/* Aspect ratio selector */}
             <div className="crop-aspect-row">
@@ -390,6 +476,66 @@ export default function ManageContent() {
             </div>
           </div>
 
+          {/* Home Hero Video */}
+          <h2 style={{ marginTop: 40 }}>Home Page Hero Video</h2>
+          <p>
+            Optional background video for the home page hero (takes priority over the hero
+            photo when set). MP4 recommended, muted/looping, under 8MB.
+          </p>
+          <div className="photo-upload-area">
+            {heroVideo ? (
+              <video src={heroVideo} className="photo-preview" muted loop autoPlay playsInline />
+            ) : (
+              <div className="photo-placeholder">No hero video uploaded yet</div>
+            )}
+            <div className="photo-upload-controls">
+              <label className="photo-upload-btn">
+                {heroVideo ? 'Change Video' : 'Choose Video'}
+                <input type="file" accept="video/mp4,video/webm" onChange={onHeroVideoSelected} style={{ display: 'none' }} />
+              </label>
+              {heroVideo && (
+                <>
+                  <button className="btn-save" onClick={saveHeroVideo} disabled={savingHeroVideo}>
+                    {savingHeroVideo ? 'Saving…' : 'Save Hero Video'}
+                  </button>
+                  <button className="btn-delete" onClick={deleteHeroVideo}>
+                    Delete Video
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Train with Everett Hero Photo */}
+          <h2 style={{ marginTop: 40 }}>Train with Everett Hero Photo</h2>
+          <p>Displayed in the "Train With Everett" panel on the home page, below the hero. Separate from the About page photo.</p>
+          <div className="photo-upload-area">
+            {focusPhotoPreview ? (
+              <img src={focusPhotoPreview} alt="Train with Everett preview" className="photo-preview" />
+            ) : (
+              <div className="photo-placeholder">No photo uploaded yet</div>
+            )}
+            <div className="photo-upload-controls">
+              <label className="photo-upload-btn">
+                {focusPhotoPreview ? 'Change Photo' : 'Choose Photo'}
+                <input type="file" accept="image/*" onChange={(e) => openCropFor(e, 'focus')} style={{ display: 'none' }} />
+              </label>
+              {focusPhotoPreview && (
+                <>
+                  <button className="btn-cancel" onClick={() => { setCropTarget('focus'); setCropSrc(focusPhotoPreview); }}>
+                    Edit Crop
+                  </button>
+                  <button className="btn-save" onClick={saveFocusPhoto} disabled={savingFocusPhoto}>
+                    {savingFocusPhoto ? 'Saving…' : 'Save Photo'}
+                  </button>
+                  <button className="btn-delete" onClick={deleteFocusPhoto}>
+                    Delete Photo
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
           {/* About Page Photo */}
           <h2 style={{ marginTop: 40 }}>About Page Photo</h2>
           <p>Displayed on the About page hero section.</p>
@@ -457,7 +603,7 @@ export default function ManageContent() {
                   value={addTestForm.quote}
                   onChange={(e) => setAddTestForm((p) => ({ ...p, quote: e.target.value }))}
                   rows={3}
-                  placeholder='"Drew changed my life completely."'
+                  placeholder='"Everett changed my life completely."'
                 />
               </div>
               <div className="form-group">

@@ -1,34 +1,94 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital@1&display=swap');
 
+/* ============================================================
+   AIO FITNESS — sharp, high-energy athletic palette.
+   Same brand colors as before (gold/navy) — only geometry,
+   shadow language, and typography attitude changed.
+   Variable names are historical but now hold the structural
+   equivalents — kept as-is rather than renamed everywhere,
+   since every stylesheet already references them.
+   ============================================================ */
 :root {
-  --white: #ffffff;
-  --gray-50: #f8fafc;
-  --gray-100: #f1f5f9;
-  --gray-200: #e2e8f0;
-  --gray-500: #94a3b8;
-  --gray-600: #64748b;
-  --gray-900: #0f172a;
-  --blue: #1E5FE5;
-  --blue-hover: #1652cc;
-  --blue-light: #eef3fd;
-  --blue-dark: #1240aa;
-  --purple: #7c3aed;
-  --purple-light: #ede9fe;
-  --navy: #0a0f1e;
-  --navy-mid: #111827;
-  --red-light: #fff0f0;
-  --red: #cc0000;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0,0,0,0.05);
-  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-blue: 0 4px 20px rgba(30, 95, 229, 0.25);
-  --radius: 12px;
-  --radius-sm: 8px;
-  --radius-lg: 20px;
-  --transition: 0.2s ease;
+  /* Page background — true/warm black, not blue-black, so the gold
+     reads as luxury rather than tech (matches the logo's pure-black
+     backdrop). */
+  --navy: #0a0a09;
+  --navy-mid: #131311;
+
+  /* Panel fill — solid, opaque. No glass/blur in this aesthetic. */
+  --white: #1a1917;
+
+  /* Surface / text scale — flipped for light-on-dark */
+  --gray-50: #1a1917;
+  --gray-100: #201f1c;
+  --gray-200: rgba(255, 255, 255, 0.14);
+  --gray-500: rgba(245, 243, 240, 0.45);
+  --gray-600: rgba(245, 243, 240, 0.66);
+  --gray-900: #f5f3ee;
+
+  /* Primary accent — gold (anchored to the logo) */
+  --blue: #D4AF37;
+  --blue-hover: #E8C659;
+  --blue-light: rgba(212, 175, 55, 0.14);
+  --blue-dark: #8C6D1F;
+  /* Brightest specular tone sampled from the logo's hottest highlight
+     (p95–p99 of its gold pixels) — not used as a UI color on its own,
+     only as the source for gloss/streak effects. */
+  --blue-highlight: #F9E180;
+
+  /* Secondary accent — deep bronze */
+  --purple: #8B6914;
+  --purple-light: rgba(139, 105, 20, 0.14);
+
+  --red: #ff5c5c;
+  --red-light: rgba(255, 92, 92, 0.12);
+
+  /* Soft, blurred shadows — premium depth instead of hard offsets */
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.22);
+  --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 22px 50px rgba(0, 0, 0, 0.32);
+  --shadow-blue: 0 10px 30px rgba(212, 175, 55, 0.28);
+  --glow-gold: 0 0 36px rgba(212, 175, 55, 0.35);
+
+  /* Polished-gold "metal" gradient — three distinct tonal bands (not
+     one smooth blend) to match the logo's actual highlight/mid/shadow
+     zones, reused verbatim wherever something needs to speak the same
+     material (primary CTA, logo badge border only). */
+  --gloss-metal: linear-gradient(
+    135deg,
+    var(--blue-hover) 0%,
+    var(--blue-hover) 18%,
+    var(--blue) 26%,
+    var(--blue) 58%,
+    var(--blue-dark) 66%,
+    var(--blue-dark) 100%
+  );
+  /* Specular streak layered on top of --gloss-metal, mimicking the
+     bright line down the logo's heavier strokes (the "1", the
+     dumbbell bar) — a sustained plateau at real opacity, not a
+     single faint point, so it reads as a distinct detail. */
+  --gloss-streak: linear-gradient(
+    135deg,
+    transparent 32%,
+    color-mix(in srgb, var(--blue-highlight) 80%, transparent) 42%,
+    color-mix(in srgb, var(--blue-highlight) 80%, transparent) 50%,
+    transparent 60%
+  );
+
+  /* Soft, rounded geometry */
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 22px;
+  --transition: 0.12s linear;
   --max-width: 1200px;
+
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --gradient-blue: linear-gradient(135deg, #1E5FE5 0%, #7c3aed 100%);
-  --gradient-hero: linear-gradient(135deg, #0f172a 0%, #1E5FE5 60%, #7c3aed 100%);
-  --gradient-section: linear-gradient(160deg, #f8faff 0%, #eef2ff 100%);
+  --font-heading: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Anton', 'Poppins', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-quote: 'Playfair Display', Georgia, 'Times New Roman', serif;
+
+  --gradient-blue: linear-gradient(135deg, #D4AF37 0%, #8B6914 100%);
+  --gradient-hero: linear-gradient(135deg, #0a0a09 0%, #3d3216 55%, #D4AF37 100%);
+  --gradient-section: linear-gradient(160deg, #0c0b09 0%, #1a1917 100%);
 }

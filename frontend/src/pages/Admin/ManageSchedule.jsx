@@ -352,7 +352,7 @@ export default function ManageSchedule() {
   return (
     <main className="manage-schedule">
       <Link to="/admin/dashboard" style={{ fontSize: 14, color: 'var(--blue)', textDecoration: 'none', display: 'inline-block', marginBottom: 16 }}>← Back</Link>
-      <h1>Manage Schedule</h1>
+      <h1>Manage <span>Schedule</span></h1>
 
       {fetchError && <p className="error-message">{fetchError}</p>}
 

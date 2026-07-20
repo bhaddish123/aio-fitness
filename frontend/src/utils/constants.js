@@ -44,3 +44,27 @@ export const FORM_FIELDS = {
   SESSION_TYPE_ID: 'sessionTypeId',
   START_TIME: 'startTime',
 };
+
+// Client intake — Fitness Intake sub-step options
+export const SEX_OPTIONS = [
+  { value: 'MALE', label: 'Male' },
+  { value: 'FEMALE', label: 'Female' },
+];
+
+export const EXPERIENCE_LEVEL_OPTIONS = [
+  { value: 'ONE_YEAR_OR_LESS', label: '1 year or less of training' },
+  { value: 'TWO_TO_FOUR_YEARS', label: '2–4 years of training' },
+  { value: 'FOUR_PLUS_YEARS', label: '4+ years of training' },
+];
+
+export const HELP_NEEDED_OPTIONS = [
+  { value: 'WEIGHT_LOSS', label: 'Weight loss' },
+  { value: 'MUSCLE_GAIN', label: 'Muscle gain' },
+  { value: 'GENERAL_FITNESS', label: 'General fitness' },
+  { value: 'BODYBUILDING', label: 'Bodybuilding' },
+  { value: 'NUTRITION', label: 'Nutrition & food choices' },
+  { value: 'FLEXIBILITY', label: 'Flexibility' },
+  { value: 'INJURY_PAIN', label: 'Fixing pains/injuries' },
+  { value: 'CARDIO', label: 'Cardio' },
+  { value: 'OTHER', label: 'Other' },
+];

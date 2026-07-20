@@ -1,0 +1,250 @@
+/* ─── Online Coaching page ──────────────────────────────────────── */
+.coaching-page {
+  max-width: 100%;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────── */
+.coaching-hero {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 80px 32px 64px;
+  text-align: center;
+}
+
+.coaching-eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--blue);
+  margin-bottom: 20px;
+}
+
+.coaching-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 7vw, 88px);
+  text-transform: uppercase;
+  letter-spacing: 0;
+  line-height: 0.95;
+  color: var(--gray-900);
+  margin: 0 0 28px;
+}
+
+.coaching-hero-sub {
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: clamp(15px, 1.6vw, 18px);
+  color: var(--gray-600);
+  line-height: 1.65;
+}
+
+/* ── Tier grid ────────────────────────────────────────────────── */
+.coaching-tiers {
+  background: var(--gradient-section);
+  border-top: 1px solid var(--gray-200);
+  padding: 80px 32px;
+}
+
+.coaching-tiers .heading-pop {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.coaching-tier-grid {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.coaching-tier-card {
+  position: relative;
+  background: var(--navy);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 36px 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.coaching-tier-card--featured {
+  border-color: var(--blue);
+  border-width: 2px;
+  box-shadow: 0 0 32px rgba(212, 175, 55, 0.12);
+}
+
+.coaching-tier-badge {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--blue);
+  color: var(--navy);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 4px 14px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.coaching-tier-name {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0 0 16px;
+  line-height: 1.25;
+}
+
+.coaching-tier-price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.coaching-tier-amount {
+  font-family: var(--font-mono);
+  font-size: clamp(32px, 4vw, 44px);
+  font-weight: 700;
+  color: var(--blue);
+  line-height: 1;
+}
+
+.coaching-tier-per {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+.coaching-tier-tagline {
+  font-size: 14px;
+  color: var(--gray-600);
+  line-height: 1.55;
+  margin: 0 0 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.coaching-tier-includes {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.coaching-tier-includes li {
+  font-size: 14px;
+  color: var(--gray-600);
+  line-height: 1.5;
+  padding-left: 20px;
+  position: relative;
+}
+
+.coaching-tier-includes li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.coaching-tier-bonus {
+  font-size: 13px;
+  color: var(--blue);
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.coaching-tier-cta {
+  width: 100%;
+  text-align: center;
+  margin-top: auto;
+}
+
+.coaching-pricing-note {
+  max-width: var(--max-width);
+  margin: 24px auto 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--gray-600);
+  opacity: 0.7;
+}
+
+/* ── Philosophy ───────────────────────────────────────────────── */
+.coaching-philosophy {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 80px 32px;
+  text-align: center;
+}
+
+.coaching-philosophy h2 {
+  margin-bottom: 28px;
+}
+
+.coaching-philosophy p {
+  font-size: clamp(15px, 1.5vw, 17px);
+  color: var(--gray-600);
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+
+.coaching-philosophy-cta-row {
+  margin-top: 36px;
+  color: var(--gray-600);
+}
+
+.coaching-inline-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--blue);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.coaching-inline-link:hover {
+  color: #e8c84a;
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .coaching-tier-grid {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+  }
+}
+
+@media (max-width: 600px) {
+  .coaching-hero,
+  .coaching-philosophy {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .coaching-tiers {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
