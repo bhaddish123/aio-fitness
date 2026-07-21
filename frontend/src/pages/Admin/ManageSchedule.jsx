@@ -17,31 +17,30 @@ const toStatusClass = (status) => {
     case 'blocked':                return 'blocked';
     case BOOKING_STATUS.CANCELLED:
     case BOOKING_STATUS.REFUNDED:  return 'cancelled';
+    case 'NOT_SET':                return 'not-set';
     default:                       return 'available';
   }
 };
 
 
-const formatTime = (iso) =>
-  new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
-/** Generate 30-min local time options from 9:00 to 18:00 */
-const generateTimeOptions = () => {
-  const options = [];
-  for (let h = 9; h < 18; h++) {
-    options.push(`${String(h).padStart(2, '0')}:00`);
-    options.push(`${String(h).padStart(2, '0')}:30`);
+const DAY_LABELS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAY_ORDER  = [1,2,3,4,5,6,0];
+const fmtT = (t) => t ? t.slice(0, 5) : '';
+
+/** 5:00 AM – 9:30 PM in 30-min steps (34 options) */
+const generateFullDayCandidates = () => {
+  const times = [];
+  for (let h = 5; h <= 21; h++) {
+    times.push(`${String(h).padStart(2, '0')}:00`);
+    times.push(`${String(h).padStart(2, '0')}:30`);
   }
-  return options; // ["09:00", "09:30", ..., "17:30"]
+  return times;
 };
 
-const TIME_OPTIONS = generateTimeOptions();
-
-const formatLocalTime = (hhmm) => {
+const fmtCandidateTime = (hhmm) => {
   const [h, m] = hhmm.split(':').map(Number);
-  const period = h < 12 ? 'AM' : 'PM';
-  const hour   = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
 };
 
 const ALL_STATUS_FILTERS = {
@@ -63,8 +62,6 @@ const EMPTY_MODAL = {
   checkedSlots: [],
   isLoading:    false,
   apiError:     null,
-  showAddForm:   false,
-  newSlotTimes:  [],
 };
 
 /* ── component ───────────────────────────────────────────────── */
@@ -81,6 +78,14 @@ export default function ManageSchedule() {
   const [fetchError, setFetchError]         = useState(null);
   const [toast, setToast]                   = useState(null);
   const [modal, setModal]                   = useState(EMPTY_MODAL);
+  const [availabilityRules, setAvailabilityRules] = useState([]);
+  const [weeklyPanelOpen, setWeeklyPanelOpen]     = useState(false);
+  const [ruleAddForm, setRuleAddForm]             = useState({ dayOfWeek: 1, startTime: '07:00', endTime: '14:00', isActive: true });
+  const [showAddRuleForm, setShowAddRuleForm]     = useState(false);
+  const [editingRuleId, setEditingRuleId]         = useState(null);
+  const [editRuleForm, setEditRuleForm]           = useState({});
+  const [ruleError, setRuleError]                 = useState(null);
+  const [savingRule, setSavingRule]               = useState(false);
 
   /* ── data fetching ─────────────────────────────────────────── */
 
@@ -88,8 +93,9 @@ export default function ManageSchedule() {
     Promise.all([
       bookingService.getAllBookings(),
       scheduleService.getSessionTypes(),
+      scheduleService.getAvailabilityRules(),
     ])
-      .then(([b, st]) => { setBookings(b); setSessionTypes(st); })
+      .then(([b, st, rules]) => { setBookings(b); setSessionTypes(st); setAvailabilityRules(rules); })
       .catch(() => setFetchError('Failed to load schedule data.'))
       .finally(() => setLoading(false));
 
@@ -127,14 +133,117 @@ export default function ManageSchedule() {
       .catch(() => {});
   }, []);
 
+  /* ── availability rule CRUD ─────────────────────────────────── */
+
+  function findRuleConflict(rules, dayOfWeek, startTime, endTime, excludeId = null) {
+    return rules.find(
+      (r) =>
+        r.isActive &&
+        r.dayOfWeek === Number(dayOfWeek) &&
+        r.id !== excludeId &&
+        r.startTime.slice(0, 5) < endTime &&
+        r.endTime.slice(0, 5) > startTime,
+    );
+  }
+
+  function validateRuleForm(form, excludeId = null) {
+    if (form.endTime <= form.startTime) return 'End time must be after start time.';
+    if (form.isActive) {
+      const conflict = findRuleConflict(availabilityRules, form.dayOfWeek, form.startTime, form.endTime, excludeId);
+      if (conflict) return `Conflicts with: ${fmtT(conflict.startTime)}–${fmtT(conflict.endTime)}`;
+    }
+    return null;
+  }
+
+  async function handleAddRule(e) {
+    e.preventDefault();
+    const err = validateRuleForm(ruleAddForm);
+    if (err) { setRuleError(err); return; }
+    setSavingRule(true); setRuleError(null);
+    try {
+      const created = await scheduleService.createAvailabilityRule({
+        dayOfWeek: Number(ruleAddForm.dayOfWeek),
+        startTime: ruleAddForm.startTime,
+        endTime: ruleAddForm.endTime,
+        isActive: ruleAddForm.isActive,
+      });
+      setAvailabilityRules((prev) => [...prev, created]);
+      setShowAddRuleForm(false);
+      setRuleAddForm({ dayOfWeek: 1, startTime: '07:00', endTime: '14:00', isActive: true });
+      showToast('Rule added.');
+    } catch (err) {
+      setRuleError(err?.response?.data?.error || 'Failed to add rule.');
+    } finally {
+      setSavingRule(false);
+    }
+  }
+
+  async function handleEditRule(e) {
+    e.preventDefault();
+    const err = validateRuleForm(editRuleForm, editingRuleId);
+    if (err) { setRuleError(err); return; }
+    setSavingRule(true); setRuleError(null);
+    try {
+      const updated = await scheduleService.updateAvailabilityRule(editingRuleId, {
+        dayOfWeek: Number(editRuleForm.dayOfWeek),
+        startTime: editRuleForm.startTime,
+        endTime: editRuleForm.endTime,
+        isActive: editRuleForm.isActive,
+      });
+      setAvailabilityRules((prev) => prev.map((r) => (r.id === editingRuleId ? updated : r)));
+      setEditingRuleId(null);
+      showToast('Rule updated.');
+    } catch (err) {
+      setRuleError(err?.response?.data?.error || 'Failed to update rule.');
+    } finally {
+      setSavingRule(false);
+    }
+  }
+
+  async function handleToggleRule(rule) {
+    const newActive = !rule.isActive;
+    if (newActive) {
+      const conflict = findRuleConflict(availabilityRules, rule.dayOfWeek, fmtT(rule.startTime), fmtT(rule.endTime), rule.id);
+      if (conflict) {
+        showToast(`Cannot activate — conflicts with ${fmtT(conflict.startTime)}–${fmtT(conflict.endTime)}`, 'error');
+        return;
+      }
+    }
+    try {
+      const result = await scheduleService.updateAvailabilityRule(rule.id, { isActive: newActive });
+      setAvailabilityRules((prev) => prev.map((r) => (r.id === rule.id ? result : r)));
+      showToast(result.isActive ? 'Rule activated.' : 'Rule deactivated.');
+    } catch (err) {
+      showToast(err?.response?.data?.error || 'Failed to update rule.', 'error');
+    }
+  }
+
+  async function handleDeleteRule(id) {
+    if (!window.confirm('Delete this availability rule?')) return;
+    try {
+      await scheduleService.deleteAvailabilityRule(id);
+      setAvailabilityRules((prev) => prev.filter((r) => r.id !== id));
+      showToast('Rule deleted.');
+    } catch {
+      showToast('Failed to delete rule.', 'error');
+    }
+  }
+
+  function startEditRule(rule) {
+    setEditingRuleId(rule.id);
+    setEditRuleForm({
+      dayOfWeek: rule.dayOfWeek,
+      startTime: fmtT(rule.startTime),
+      endTime: fmtT(rule.endTime),
+      isActive: rule.isActive,
+    });
+    setRuleError(null);
+    setShowAddRuleForm(false);
+  }
+
   /* ── derived data for CalendarView display ─────────────────── */
 
-  const defaultCalendarDate = useMemo(() => {
-    if (!bookings.length) return new Date();
-    return new Date([...bookings].sort(
-      (a, b) => new Date(b.startTime) - new Date(a.startTime)
-    )[0].startTime);
-  }, [bookings]);
+  const defaultCalendarDate = useMemo(() => new Date(), []);
 
   const bookedTimes = useMemo(() =>
     new Set(
@@ -168,6 +277,22 @@ export default function ManageSchedule() {
     () => [...bookingEvents, ...availableEvents, ...blockedEvents],
     [bookingEvents, availableEvents, blockedEvents],
   );
+
+  /** Full unified slot list for the day modal: existing API slots + NOT_SET candidates */
+  const modalDaySlots = useMemo(() => {
+    if (!modal.open || modal.modalLoading) return [];
+    const existing = modal.daySlots.map((s) => ({
+      ...s,
+      localTime: new Date(s.slotTime).toLocaleTimeString('en-US', {
+        hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/New_York',
+      }),
+    }));
+    const existingTimes = new Set(existing.map((s) => s.localTime));
+    const notSet = generateFullDayCandidates()
+      .filter((t) => !existingTimes.has(t))
+      .map((t) => ({ localTime: t, status: 'NOT_SET' }));
+    return [...existing, ...notSet].sort((a, b) => a.localTime.localeCompare(b.localTime));
+  }, [modal.open, modal.modalLoading, modal.daySlots]);
 
   /* ── modal helpers ─────────────────────────────────────────── */
 
@@ -210,12 +335,7 @@ export default function ManageSchedule() {
   }, []);
 
   const selectSlot = (slot) => {
-    setModal((prev) => ({
-      ...prev,
-      selected:    slot,
-      apiError:    null,
-      showAddForm: false,
-    }));
+    setModal((prev) => ({ ...prev, selected: slot, apiError: null }));
   };
 
   const toggleCheck = (slotTime) => {
@@ -231,8 +351,8 @@ export default function ManageSchedule() {
   };
 
   const toggleCheckAll = () => {
+    const allTimes = modalDaySlots.map((s) => s.localTime);
     setModal((prev) => {
-      const allTimes = prev.daySlots.map((s) => s.slotTime);
       const allChecked = allTimes.every((t) => prev.checkedSlots.includes(t));
       return { ...prev, checkedSlots: allChecked ? [] : allTimes };
     });
@@ -245,30 +365,30 @@ export default function ManageSchedule() {
     return () => window.removeEventListener('keydown', onKey);
   }, [closeModal]);
 
-  /* ── block available slot ──────────────────────────────────── */
+  /* ── shared slot-status setter (block or add) ─────────────── */
 
-  const handleBlockSlot = async () => {
-    const { selected, dateKey } = modal;
-    if (!selected || selected.status !== 'AVAILABLE') return;
-
-    // Extract local time from slot's slotTime (UTC ISO string)
-    const slotDate = new Date(selected.slotTime);
-    const localTime = slotDate.toLocaleTimeString('en-US', {
-      hour: '2-digit', minute: '2-digit', hour12: false,
-      timeZone: 'America/New_York',
-    });
-
+  const setSlotStatus = useCallback(async (dateKey, localTime, blocked) => {
     setModal((prev) => ({ ...prev, isLoading: true, apiError: null }));
     try {
-      await scheduleService.createOverride({ date: dateKey, localTime, blocked: true });
-      showToast('Slot blocked.');
+      await scheduleService.createOverride({ date: dateKey, localTime, blocked });
+      showToast(blocked ? 'Slot blocked.' : 'Slot added.');
       refreshAvailableSlots();
       refreshBlockedOverrides();
       await fetchDaySlots(dateKey);
       setModal((prev) => ({ ...prev, isLoading: false, selected: null }));
     } catch {
-      setModal((prev) => ({ ...prev, isLoading: false, apiError: 'Failed to block slot. Try again.' }));
+      setModal((prev) => ({
+        ...prev,
+        isLoading: false,
+        apiError: `Failed to ${blocked ? 'block' : 'add'} slot. Try again.`,
+      }));
     }
+  }, [fetchDaySlots, refreshAvailableSlots, refreshBlockedOverrides]);
+
+  const handleBlockSlot = () => {
+    const { selected, dateKey } = modal;
+    if (!selected || selected.status !== 'AVAILABLE') return;
+    setSlotStatus(dateKey, selected.localTime, true);
   };
 
   /* ── unblock slot ──────────────────────────────────────────── */
@@ -290,24 +410,21 @@ export default function ManageSchedule() {
     }
   };
 
-  /* ── bulk block selected slots ────────────────────────────── */
+  /* ── bulk block / add selected slots ─────────────────────── */
 
   const handleBulkBlock = async () => {
-    const { checkedSlots, dateKey, daySlots } = modal;
-    const toBlock = checkedSlots.filter((st) =>
-      daySlots.find((s) => s.slotTime === st && s.status === 'AVAILABLE')
+    const { checkedSlots, dateKey } = modal;
+    const toBlock = checkedSlots.filter((lt) =>
+      modalDaySlots.find((s) => s.localTime === lt && s.status === 'AVAILABLE')
     );
     if (!toBlock.length) return;
 
     setModal((prev) => ({ ...prev, isLoading: true, apiError: null }));
     try {
-      await Promise.all(toBlock.map((slotTime) => {
-        const localTime = new Date(slotTime).toLocaleTimeString('en-US', {
-          hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/New_York',
-        });
-        return scheduleService.createOverride({ date: dateKey, localTime, blocked: true });
-      }));
-      showToast(`${toBlock.length} slot(s) blocked.`);
+      await Promise.all(
+        toBlock.map((localTime) => scheduleService.createOverride({ date: dateKey, localTime, blocked: true }))
+      );
+      showToast(`${toBlock.length} slot${toBlock.length !== 1 ? 's' : ''} blocked.`);
       refreshAvailableSlots();
       refreshBlockedOverrides();
       await fetchDaySlots(dateKey);
@@ -317,24 +434,25 @@ export default function ManageSchedule() {
     }
   };
 
-  /* ── add new slot ──────────────────────────────────────────── */
-
-  const handleAddSlot = async () => {
-    const { dateKey, newSlotTimes } = modal;
-    if (!newSlotTimes.length) return;
+  const handleBulkAdd = async () => {
+    const { checkedSlots, dateKey } = modal;
+    const toAdd = checkedSlots.filter((lt) =>
+      modalDaySlots.find((s) => s.localTime === lt && (s.status === 'BLOCKED' || s.status === 'NOT_SET'))
+    );
+    if (!toAdd.length) return;
 
     setModal((prev) => ({ ...prev, isLoading: true, apiError: null }));
     try {
       await Promise.all(
-        newSlotTimes.map((t) => scheduleService.createOverride({ date: dateKey, localTime: t, blocked: false }))
+        toAdd.map((localTime) => scheduleService.createOverride({ date: dateKey, localTime, blocked: false }))
       );
-      showToast(`${newSlotTimes.length} slot(s) added.`);
+      showToast(`${toAdd.length} slot${toAdd.length !== 1 ? 's' : ''} added.`);
       refreshAvailableSlots();
       refreshBlockedOverrides();
       await fetchDaySlots(dateKey);
-      setModal((prev) => ({ ...prev, isLoading: false, showAddForm: false, newSlotTimes: [] }));
+      setModal((prev) => ({ ...prev, isLoading: false, checkedSlots: [] }));
     } catch {
-      setModal((prev) => ({ ...prev, isLoading: false, apiError: 'Failed to add slots. Try again.' }));
+      setModal((prev) => ({ ...prev, isLoading: false, apiError: 'Failed to add slots.' }));
     }
   };
 
@@ -355,6 +473,83 @@ export default function ManageSchedule() {
       <h1>Manage <span>Schedule</span></h1>
 
       {fetchError && <p className="error-message">{fetchError}</p>}
+
+      {/* Default Weekly Hours panel */}
+      <div className="weekly-hours-panel">
+        <button
+          className="weekly-hours-toggle"
+          onClick={() => { setWeeklyPanelOpen((v) => !v); setShowAddRuleForm(false); setEditingRuleId(null); setRuleError(null); }}
+        >
+          Default Weekly Hours {weeklyPanelOpen ? '▴' : '▾'}
+        </button>
+
+        {weeklyPanelOpen && (
+          <div className="weekly-hours-body">
+            <p style={{ fontSize: 13, color: 'var(--gray-400)', margin: '0 0 16px' }}>
+              Recurring schedule shown to clients on the booking page. Changes take effect immediately.
+            </p>
+
+            {DAY_ORDER.map((day) => {
+              const dayRules = availabilityRules.filter((r) => r.dayOfWeek === day);
+              return (
+                <div key={day} className="weekly-day-group">
+                  <h4 className="weekly-day-label">{DAY_LABELS[day]}</h4>
+                  {dayRules.length === 0 ? (
+                    <p className="weekly-day-empty">No rules</p>
+                  ) : (
+                    dayRules.map((rule) => (
+                      <div key={rule.id} className="weekly-rule-row">
+                        {editingRuleId === rule.id ? (
+                          <form className="weekly-rule-form" onSubmit={handleEditRule}>
+                            <RuleFormInline form={editRuleForm} onChange={setEditRuleForm} />
+                            {ruleError && <p className="error-message" style={{ margin: '6px 0 0', fontSize: 12 }}>{ruleError}</p>}
+                            <div className="slot-edit-actions" style={{ marginTop: 8 }}>
+                              <button className="btn-save" type="submit" disabled={savingRule}>{savingRule ? 'Saving…' : 'Save'}</button>
+                              <button className="btn-cancel" type="button" onClick={() => { setEditingRuleId(null); setRuleError(null); }}>Cancel</button>
+                            </div>
+                          </form>
+                        ) : (
+                          <>
+                            <span className="weekly-rule-time">{fmtT(rule.startTime)} – {fmtT(rule.endTime)}</span>
+                            <span className={`status-badge ${rule.isActive ? 'confirmed' : 'cancelled'}`}>
+                              {rule.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                            <div className="weekly-rule-actions">
+                              <button className="btn-save" onClick={() => startEditRule(rule)}>Edit</button>
+                              <button className={rule.isActive ? 'btn-cancel' : 'btn-save'} onClick={() => handleToggleRule(rule)}>
+                                {rule.isActive ? 'Deactivate' : 'Activate'}
+                              </button>
+                              <button className="btn-delete" onClick={() => handleDeleteRule(rule.id)}>Delete</button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              );
+            })}
+
+            <div style={{ marginTop: 20 }}>
+              {showAddRuleForm ? (
+                <form className="weekly-rule-form" onSubmit={handleAddRule}>
+                  <h4 style={{ margin: '0 0 12px', fontSize: 14 }}>New Rule</h4>
+                  <RuleFormInline form={ruleAddForm} onChange={setRuleAddForm} />
+                  {ruleError && !editingRuleId && <p className="error-message" style={{ margin: '6px 0 0', fontSize: 12 }}>{ruleError}</p>}
+                  <div className="slot-edit-actions" style={{ marginTop: 8 }}>
+                    <button className="btn-save" type="submit" disabled={savingRule}>{savingRule ? 'Saving…' : 'Add Rule'}</button>
+                    <button className="btn-cancel" type="button" onClick={() => { setShowAddRuleForm(false); setRuleError(null); }}>Cancel</button>
+                  </div>
+                </form>
+              ) : (
+                <button className="btn-add-slot" onClick={() => { setShowAddRuleForm(true); setEditingRuleId(null); setRuleError(null); }}>
+                  + Add Rule
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Session Type Filter */}
       <div className="schedule-filters">
@@ -404,155 +599,103 @@ export default function ManageSchedule() {
 
             <div className="day-modal-header">
               <h2>Edit Slots for {modal.dateLabel}</h2>
-              <button
-                className="btn-add-slot"
-                onClick={() => setModal((prev) => ({
-                  ...prev, showAddForm: !prev.showAddForm, selected: null,
-                }))}
-              >
-                {modal.showAddForm ? 'Cancel' : '+ Add Slot'}
-              </button>
             </div>
-
-            {/* Add New Slot form */}
-            {modal.showAddForm && (() => {
-              const existingTimes = new Set(
-                modal.daySlots.map((s) =>
-                  new Date(s.slotTime).toLocaleTimeString('en-US', {
-                    hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/New_York',
-                  })
-                )
-              );
-              const availableTimes = TIME_OPTIONS.filter((t) => !existingTimes.has(t));
-              const allSelected = availableTimes.length > 0 && availableTimes.every((t) => modal.newSlotTimes.includes(t));
-              return (
-                <div className="day-slot-add-form">
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <p style={{ fontSize: 13, margin: 0, color: 'var(--gray-600)' }}>Select times to add:</p>
-                    {availableTimes.length > 0 && (
-                      <label style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={allSelected}
-                          onChange={() => setModal((prev) => ({
-                            ...prev,
-                            newSlotTimes: allSelected ? [] : availableTimes,
-                          }))}
-                        />
-                        Select all
-                      </label>
-                    )}
-                  </div>
-                  {availableTimes.length === 0 ? (
-                    <p style={{ fontSize: 13, color: 'var(--gray-500)' }}>All time slots already exist for this day.</p>
-                  ) : (
-                    <div className="add-slot-time-grid">
-                      {availableTimes.map((t) => {
-                        const checked = modal.newSlotTimes.includes(t);
-                        return (
-                          <label key={t} className={`add-slot-time-option${checked ? ' selected' : ''}`}>
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() => setModal((prev) => ({
-                                ...prev,
-                                newSlotTimes: checked
-                                  ? prev.newSlotTimes.filter((x) => x !== t)
-                                  : [...prev.newSlotTimes, t],
-                              }))}
-                            />
-                            {formatLocalTime(t)}
-                          </label>
-                        );
-                      })}
-                    </div>
-                  )}
-                  <div className="slot-edit-actions" style={{ marginTop: 12 }}>
-                    <button
-                      className="btn-save"
-                      onClick={handleAddSlot}
-                      disabled={modal.isLoading || modal.newSlotTimes.length === 0}
-                    >
-                      {modal.isLoading ? 'Adding…' : `Add ${modal.newSlotTimes.length || ''} Slot${modal.newSlotTimes.length !== 1 ? 's' : ''}`}
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
 
             {/* Scrollable slot list */}
             <div className="day-slot-list">
               {modal.modalLoading && (
                 <p className="day-slot-empty">Loading slots…</p>
               )}
-              {!modal.modalLoading && modal.daySlots.length === 0 && (
-                <p className="day-slot-empty">
-                  No slots for this day.{' '}
-                  <button
-                    className="link-btn"
-                    onClick={() => setModal((prev) => ({ ...prev, showAddForm: true }))}
-                  >
-                    Add one?
-                  </button>
-                </p>
-              )}
-              {!modal.modalLoading && modal.daySlots.length > 0 && (
-                <div className="day-slot-select-all">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={modal.daySlots.length > 0 && modal.daySlots.every((s) => modal.checkedSlots.includes(s.slotTime))}
-                      onChange={toggleCheckAll}
-                    />
-                    Select all
-                  </label>
-                  {modal.checkedSlots.length > 0 && (
-                    <button
-                      className="btn-delete"
-                      onClick={handleBulkBlock}
-                      disabled={modal.isLoading}
-                    >
-                      {modal.isLoading ? 'Blocking…' : `Block Selected (${modal.checkedSlots.length})`}
-                    </button>
-                  )}
-                </div>
-              )}
-              {modal.daySlots.map((slot, i) => {
-                const sc         = toStatusClass(slot.status);
-                const isSelected = selected?.slotTime === slot.slotTime;
-                const isChecked  = modal.checkedSlots.includes(slot.slotTime);
+              {!modal.modalLoading && (() => {
+                const blockableCount = modal.checkedSlots.filter((lt) =>
+                  modalDaySlots.find((s) => s.localTime === lt && s.status === 'AVAILABLE')
+                ).length;
+                const addableCount = modal.checkedSlots.filter((lt) =>
+                  modalDaySlots.find((s) => s.localTime === lt && (s.status === 'BLOCKED' || s.status === 'NOT_SET'))
+                ).length;
+                const anyChecked = modal.checkedSlots.length > 0;
+                const allChecked = modalDaySlots.length > 0 && modalDaySlots.every((s) => modal.checkedSlots.includes(s.localTime));
                 return (
-                  <div
-                    key={i}
-                    className={`day-slot-row ${sc} ${isSelected ? 'day-slot-row-selected' : ''}`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => toggleCheck(slot.slotTime)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="day-slot-checkbox"
-                    />
-                    <button
-                      className="day-slot-info"
-                      onClick={() => selectSlot(slot)}
-                    >
-                      <span className="day-slot-time">{formatTime(slot.slotTime)}</span>
-                      <span className={`status-badge ${sc}`}>{slot.status}</span>
-                      {slot.clientName && (
-                        <span className="day-slot-client">{slot.clientName}</span>
+                  <>
+                    <div className="day-slot-select-all">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={allChecked}
+                          onChange={toggleCheckAll}
+                        />
+                        Select all
+                      </label>
+                      {anyChecked && (
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          {blockableCount > 0 && (
+                            <button
+                              className="btn-delete"
+                              onClick={handleBulkBlock}
+                              disabled={modal.isLoading}
+                            >
+                              {modal.isLoading ? 'Blocking…' : `Block Selected (${blockableCount})`}
+                            </button>
+                          )}
+                          {addableCount > 0 && (
+                            <button
+                              className="btn-save"
+                              onClick={handleBulkAdd}
+                              disabled={modal.isLoading}
+                            >
+                              {modal.isLoading ? 'Adding…' : `Add Selected (${addableCount})`}
+                            </button>
+                          )}
+                        </div>
                       )}
-                    </button>
-                  </div>
+                    </div>
+                    {modalDaySlots.map((slot) => {
+                      const sc         = toStatusClass(slot.status);
+                      const isSelected = selected?.localTime === slot.localTime;
+                      const isChecked  = modal.checkedSlots.includes(slot.localTime);
+                      const isNotSet   = slot.status === 'NOT_SET';
+                      return (
+                        <div
+                          key={slot.localTime}
+                          className={`day-slot-row ${sc} ${isSelected ? 'day-slot-row-selected' : ''}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => toggleCheck(slot.localTime)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="day-slot-checkbox"
+                          />
+                          {isNotSet ? (
+                            <div className="day-slot-info">
+                              <span className="day-slot-time">{fmtCandidateTime(slot.localTime)}</span>
+                              <span className={`status-badge ${sc}`}>—</span>
+                            </div>
+                          ) : (
+                            <button
+                              className="day-slot-info"
+                              onClick={() => selectSlot(slot)}
+                            >
+                              <span className="day-slot-time">{fmtCandidateTime(slot.localTime)}</span>
+                              <span className={`status-badge ${sc}`}>{slot.status}</span>
+                              {slot.clientName && (
+                                <span className="day-slot-client">{slot.clientName}</span>
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </>
                 );
-              })}
+              })()}
             </div>
 
             {/* Edit panel — shown when a slot is selected */}
             {selected && (
               <div className="day-slot-edit-form">
                 <h3>
-                  {formatTime(selected.slotTime)}
+                  {fmtCandidateTime(selected.localTime)}
                   {' — '}
                   <span className={`status-badge ${toStatusClass(selected.status)}`}>
                     {selected.status}
@@ -575,7 +718,7 @@ export default function ManageSchedule() {
                         className="btn-cancel"
                         onClick={() => setModal((prev) => ({ ...prev, selected: null }))}
                       >
-                        Deselect
+                        Close
                       </button>
                     </div>
                   </>
@@ -597,7 +740,7 @@ export default function ManageSchedule() {
                         className="btn-cancel"
                         onClick={() => setModal((prev) => ({ ...prev, selected: null }))}
                       >
-                        Deselect
+                        Close
                       </button>
                     </div>
                   </>
@@ -618,7 +761,7 @@ export default function ManageSchedule() {
                         className="btn-cancel"
                         onClick={() => setModal((prev) => ({ ...prev, selected: null }))}
                       >
-                        Deselect
+                        Close
                       </button>
                     </div>
                   </>
@@ -638,7 +781,7 @@ export default function ManageSchedule() {
                         className="btn-cancel"
                         onClick={() => setModal((prev) => ({ ...prev, selected: null }))}
                       >
-                        Deselect
+                        Close
                       </button>
                     </div>
                   </>
@@ -657,5 +800,36 @@ export default function ManageSchedule() {
         <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />
       )}
     </main>
+  );
+}
+
+function RuleFormInline({ form, onChange }) {
+  const set = (key) => (e) => {
+    const val = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    onChange((prev) => ({ ...prev, [key]: val }));
+  };
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-end' }}>
+      <div className="form-group" style={{ minWidth: 120, margin: 0 }}>
+        <label style={{ fontSize: 12, marginBottom: 4 }}>Day</label>
+        <select value={form.dayOfWeek} onChange={set('dayOfWeek')}>
+          {[1,2,3,4,5,6,0].map((d) => (
+            <option key={d} value={d}>{DAY_LABELS[d]}</option>
+          ))}
+        </select>
+      </div>
+      <div className="form-group" style={{ minWidth: 100, margin: 0 }}>
+        <label style={{ fontSize: 12, marginBottom: 4 }}>Start</label>
+        <input type="time" value={form.startTime} onChange={set('startTime')} required />
+      </div>
+      <div className="form-group" style={{ minWidth: 100, margin: 0 }}>
+        <label style={{ fontSize: 12, marginBottom: 4 }}>End</label>
+        <input type="time" value={form.endTime} onChange={set('endTime')} required />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 2 }}>
+        <input type="checkbox" id="ruleActiveInline" checked={form.isActive} onChange={set('isActive')} style={{ width: 'auto', margin: 0 }} />
+        <label htmlFor="ruleActiveInline" style={{ fontSize: 12, margin: 0, cursor: 'pointer' }}>Active</label>
+      </div>
+    </div>
   );
 }

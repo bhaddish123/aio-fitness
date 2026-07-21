@@ -23,6 +23,8 @@ export const ENDPOINTS = {
   ADMIN_BOOKING: (id) => `/admin/bookings/${id}`,
   ADMIN_BOOKING_REFUND: (id) => `/admin/bookings/${id}/refund`,
   ADMIN_AVAILABILITY: '/admin/availability',
+  ADMIN_AVAILABILITY_RULES: '/admin/availability-rules',
+  ADMIN_AVAILABILITY_RULE: (id) => `/admin/availability-rules/${id}`,
   ADMIN_SCHEDULE_DAY: '/admin/schedule/day',
   ADMIN_SCHEDULE_OVERRIDES: '/admin/schedule/overrides',
   ADMIN_SCHEDULE_OVERRIDE: (id) => `/admin/schedule/overrides/${id}`,

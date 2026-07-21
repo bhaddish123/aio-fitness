@@ -217,7 +217,8 @@ public class AdminController {
         ZoneId est = ZoneId.of("America/New_York");
         Instant slotTime = localDate.atTime(localTime).atZone(est).toInstant();
 
-        ScheduleOverride override = new ScheduleOverride();
+        ScheduleOverride override = scheduleOverrideRepository.findBySlotTime(slotTime)
+                .orElse(new ScheduleOverride());
         override.setSlotTime(slotTime);
         override.setBlocked(request.getBlocked() != null ? request.getBlocked() : false);
         override.setNotes(request.getNotes());
@@ -242,6 +243,62 @@ public class AdminController {
     public ResponseEntity<Void> deleteOverride(@PathVariable UUID id) {
         scheduleOverrideRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /* ── Availability Rules ────────────────────────────────────── */
+
+    @GetMapping("/availability-rules")
+    public ResponseEntity<List<AvailabilityRule>> getAvailabilityRules() {
+        return ResponseEntity.ok(availabilityRuleRepository.findAll());
+    }
+
+    @PostMapping("/availability-rules")
+    public ResponseEntity<?> createAvailabilityRule(@RequestBody AvailabilityRule rule) {
+        if (!rule.getEndTime().isAfter(rule.getStartTime()))
+            return ResponseEntity.badRequest().body(Map.of("error", "End time must be after start time."));
+        if (rule.getIsActive() == null || rule.getIsActive()) {
+            AvailabilityRule conflict = findOverlappingRule(null, rule.getDayOfWeek(), rule.getStartTime(), rule.getEndTime());
+            if (conflict != null)
+                return ResponseEntity.badRequest().body(Map.of("error",
+                        "Overlaps existing rule: " + conflict.getStartTime() + "–" + conflict.getEndTime()));
+        }
+        return ResponseEntity.ok(availabilityRuleRepository.save(rule));
+    }
+
+    @PatchMapping("/availability-rules/{id}")
+    public ResponseEntity<?> updateAvailabilityRule(@PathVariable UUID id,
+                                                     @RequestBody Map<String, Object> updates) {
+        AvailabilityRule rule = availabilityRuleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Rule not found"));
+        if (updates.containsKey("dayOfWeek")) rule.setDayOfWeek((Integer) updates.get("dayOfWeek"));
+        if (updates.containsKey("startTime")) rule.setStartTime(LocalTime.parse((String) updates.get("startTime")));
+        if (updates.containsKey("endTime"))   rule.setEndTime(LocalTime.parse((String) updates.get("endTime")));
+        if (updates.containsKey("isActive"))  rule.setIsActive((Boolean) updates.get("isActive"));
+        if (!rule.getEndTime().isAfter(rule.getStartTime()))
+            return ResponseEntity.badRequest().body(Map.of("error", "End time must be after start time."));
+        if (Boolean.TRUE.equals(rule.getIsActive())) {
+            AvailabilityRule conflict = findOverlappingRule(id, rule.getDayOfWeek(), rule.getStartTime(), rule.getEndTime());
+            if (conflict != null)
+                return ResponseEntity.badRequest().body(Map.of("error",
+                        "Overlaps existing rule: " + conflict.getStartTime() + "–" + conflict.getEndTime()));
+        }
+        return ResponseEntity.ok(availabilityRuleRepository.save(rule));
+    }
+
+    @DeleteMapping("/availability-rules/{id}")
+    public ResponseEntity<Void> deleteAvailabilityRule(@PathVariable UUID id) {
+        availabilityRuleRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    private AvailabilityRule findOverlappingRule(UUID excludeId, int day, LocalTime start, LocalTime end) {
+        return availabilityRuleRepository.findAll().stream()
+                .filter(r -> Boolean.TRUE.equals(r.getIsActive())
+                        && r.getDayOfWeek() == day
+                        && !r.getId().equals(excludeId)
+                        && r.getStartTime().isBefore(end)
+                        && r.getEndTime().isAfter(start))
+                .findFirst().orElse(null);
     }
 
     /* ── Legacy availability stub ──────────────────────────────── */

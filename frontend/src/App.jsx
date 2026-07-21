@@ -25,7 +25,6 @@ import Dashboard from './pages/Admin/Dashboard';
 import ManageBookings from './pages/Admin/ManageBookings';
 import ManageSchedule from './pages/Admin/ManageSchedule';
 import ManageContent from './pages/Admin/ManageContent';
-
 function AppContent() {
   const { pathname } = useLocation();
   const isAdminRoute = pathname.startsWith('/admin');

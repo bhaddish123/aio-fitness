@@ -56,6 +56,25 @@ const scheduleService = {
   async deleteOverride(id) {
     await api.delete(ENDPOINTS.ADMIN_SCHEDULE_OVERRIDE(id));
   },
+
+  async getAvailabilityRules() {
+    const response = await api.get(ENDPOINTS.ADMIN_AVAILABILITY_RULES);
+    return response.data;
+  },
+
+  async createAvailabilityRule(data) {
+    const response = await api.post(ENDPOINTS.ADMIN_AVAILABILITY_RULES, data);
+    return response.data;
+  },
+
+  async updateAvailabilityRule(id, data) {
+    const response = await api.patch(ENDPOINTS.ADMIN_AVAILABILITY_RULE(id), data);
+    return response.data;
+  },
+
+  async deleteAvailabilityRule(id) {
+    await api.delete(ENDPOINTS.ADMIN_AVAILABILITY_RULE(id));
+  },
 };
 
 export default scheduleService;
