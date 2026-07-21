@@ -111,9 +111,7 @@ export default function Login() {
               be reset from this page.
             </p>
             <p>
-              Contact your developer to get a new password set up:
-              <br />
-              <a href="mailto:bolthandz@gmail.com">bolthandz@gmail.com</a>
+              Please reach out to your site administrator to get a new password set up.
             </p>
             <button
               type="button"

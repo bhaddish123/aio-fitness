@@ -9,7 +9,6 @@ import com.aiofitness.repository.AvailabilityRuleRepository;
 import com.aiofitness.repository.BookingRepository;
 import com.aiofitness.repository.ScheduleOverrideRepository;
 import com.aiofitness.service.BookingService;
-import com.aiofitness.service.LoginAttemptService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,6 @@ public class AdminController {
     private final ScheduleOverrideRepository scheduleOverrideRepository;
     private final BookingService bookingService;
     private final JwtUtil jwtUtil;
-    private final LoginAttemptService loginAttemptService;
 
     @Value("${admin.username}")
     private String adminUsername;
@@ -40,14 +38,12 @@ public class AdminController {
                            AvailabilityRuleRepository availabilityRuleRepository,
                            ScheduleOverrideRepository scheduleOverrideRepository,
                            BookingService bookingService,
-                           JwtUtil jwtUtil,
-                           LoginAttemptService loginAttemptService) {
+                           JwtUtil jwtUtil) {
         this.bookingRepository = bookingRepository;
         this.availabilityRuleRepository = availabilityRuleRepository;
         this.scheduleOverrideRepository = scheduleOverrideRepository;
         this.bookingService = bookingService;
         this.jwtUtil = jwtUtil;
-        this.loginAttemptService = loginAttemptService;
     }
 
     /* ── Auth ──────────────────────────────────────────────────── */
@@ -56,18 +52,11 @@ public class AdminController {
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         String username = request.getUsername();
 
-        if (loginAttemptService.isLocked(username)) {
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body(Map.of("error", "Too many failed login attempts. Try again in 15 minutes."));
-        }
-
         if (adminUsername.equals(username) && adminPassword.equals(request.getPassword())) {
-            loginAttemptService.recordSuccess(username);
             String token = jwtUtil.generateToken(username);
             return ResponseEntity.ok(Map.of("token", token));
         }
 
-        loginAttemptService.recordFailure(username);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials"));
     }
 
