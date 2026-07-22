@@ -22,6 +22,7 @@ export default function CalendarView({
   onSlotClick,
   onDayClick,
   selectedSlot,
+  selectedDateKey,
   mode = 'public',
   loading = false,
   defaultDate,
@@ -144,6 +145,7 @@ export default function CalendarView({
             const isPast      = dayMidnight < todayMidnight;
             const isToday     = dayMidnight.getTime() === todayMidnight.getTime();
             const isSelected  = selectedDay && localDateKey(selectedDay.date) === key;
+            const isActive    = selectedDateKey && key === selectedDateKey;
 
             return (
               <div
@@ -154,6 +156,7 @@ export default function CalendarView({
                   isPast      ? 'past-day'      : '',
                   isToday     ? 'today'         : '',
                   isSelected  ? 'day-selected'  : '',
+                  isActive    ? 'active-day'    : '',
                   mode === 'admin' || (!isPast) ? 'day-clickable' : '',
                 ].join(' ')}
                 onClick={() => {
@@ -184,25 +187,20 @@ export default function CalendarView({
                     })()}
                   </div>
                 ) : (
-                  /* Public: individual clickable slot pills */
+                  /* Public: non-interactive slot pills (day cell handles the click) */
                   <div className="day-slots">
                     {dayEvents.slice(0, 4).map((ev, j) => {
                       const sc        = (ev.status || 'available').toLowerCase();
                       const isSlotSel = selectedSlot === ev.startTime;
                       return (
-                        <button
+                        <span
                           key={j}
                           className={`slot-pill ${sc} ${isSlotSel ? 'selected' : ''}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSlotClick && onSlotClick(ev);
-                          }}
-                          disabled={isPast}
                           title={ev.label || formatTime(ev.startTime)}
                         >
                           {formatTime(ev.startTime)}
                           {ev.label && <span className="slot-label">{ev.label}</span>}
-                        </button>
+                        </span>
                       );
                     })}
                     {dayEvents.length > 4 && (
