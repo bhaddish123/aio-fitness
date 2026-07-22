@@ -3,7 +3,8 @@
   border: 1px solid var(--gray-200);
   border-top: 3px solid var(--blue);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   background: var(--white);
   box-shadow: var(--shadow-sm);
 }

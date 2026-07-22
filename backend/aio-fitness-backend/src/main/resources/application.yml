@@ -17,6 +17,10 @@ spring:
     enabled: true
     baseline-on-migrate: true
     baseline-version: 0
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 25MB
   mail:
     host: smtp.gmail.com
     port: 587
@@ -63,5 +67,5 @@ google:
 server:
   port: 8080
   tomcat:
-    max-http-form-post-size: 15MB
-    max-swallow-size: 15MB
+    max-http-form-post-size: 25MB
+    max-swallow-size: 25MB

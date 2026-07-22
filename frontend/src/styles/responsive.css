@@ -101,4 +101,13 @@
   .philosophy-points {
     grid-template-columns: 1fr;
   }
+
+  .calendar-grid {
+    min-width: 350px;
+  }
+
+  .calendar-day,
+  .calendar-day-header {
+    padding: 4px 2px;
+  }
 }
