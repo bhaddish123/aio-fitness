@@ -227,113 +227,6 @@
   color: var(--blue);
 }
 
-/* ── Slot panel ────────────────────────────────────────────────── */
-.slot-panel {
-  background: var(--gray-100);
-  border: 1px solid var(--gray-200);
-  border-top: 3px solid var(--blue);
-  border-radius: var(--radius);
-  padding: 20px 24px;
-  margin-bottom: 16px;
-}
-
-.slot-panel-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.slot-panel-date {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--gray-900);
-  margin: 0;
-}
-
-.slot-panel-back {
-  background: none;
-  border: none;
-  color: var(--gray-600);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 4px 0;
-  white-space: nowrap;
-  transition: color 0.2s ease;
-  display: none; /* shown only on mobile via media query */
-}
-
-.slot-panel-back:hover {
-  color: var(--blue);
-}
-
-.slot-panel-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.slot-panel-empty {
-  color: var(--gray-500);
-  font-size: 14px;
-  margin: 0;
-}
-
-.slot-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 18px;
-  background: var(--gray-50, var(--white));
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: border-color 0.18s ease, background 0.18s ease;
-  text-align: left;
-  width: 100%;
-}
-
-.slot-option:hover {
-  border-color: var(--blue);
-  background: var(--gray-100);
-}
-
-.slot-option.selected {
-  background: var(--blue);
-  border-color: var(--blue);
-  color: var(--navy);
-}
-
-.slot-option-time {
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.slot-option-dur {
-  font-size: 12px;
-  color: var(--gray-500);
-}
-
-.slot-option.selected .slot-option-dur {
-  color: var(--navy);
-  opacity: 0.7;
-}
-
-@media (max-width: 640px) {
-  .calendar-wrapper.day-selected {
-    display: none;
-  }
-
-  .slot-panel-back {
-    display: block;
-  }
-
-  .step-nav-buttons.slot-panel-active .step-back-btn {
-    display: none;
-  }
-}
-
 /* ── Session tiles ─────────────────────────────────────────────── */
 .session-tile-grid {
   display: grid;
@@ -937,4 +830,95 @@
 .modal-close-btn:hover {
   background-color: var(--navy);
   color: var(--blue);
+}
+
+/* ── Day slot panel (replaces modal) ─────────────────────── */
+
+.slot-panel {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+.slot-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.slot-panel-back {
+  background: none;
+  border: none;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.slot-panel-back:hover { opacity: 0.75; }
+
+.slot-panel-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.slot-panel-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.slot-panel-empty {
+  font-size: 14px;
+  color: var(--gray-500);
+  margin: 0;
+}
+
+.slot-option {
+  padding: 10px 18px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: var(--gray-50, rgba(255,255,255,0.04));
+  color: var(--gray-900);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.slot-option:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.slot-option.selected {
+  background: var(--blue);
+  color: var(--navy);
+  border-color: var(--blue);
+  font-weight: 700;
+}
+
+/* Mobile: hide calendar when slot panel is showing */
+@media (max-width: 640px) {
+  .calendar-wrapper.day-selected { display: none; }
+  .slot-panel { margin-bottom: 0; }
+  .step-nav-buttons.slot-panel-active .step-back-btn { display: none; }
+}
+
+/* Desktop: make "← Back" subtler since calendar is still visible */
+@media (min-width: 641px) {
+  .slot-panel-back {
+    font-size: 12px;
+    opacity: 0.6;
+  }
+  .slot-panel-back:hover { opacity: 1; }
 }

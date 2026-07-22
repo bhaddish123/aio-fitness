@@ -187,7 +187,7 @@ export default function CalendarView({
                     })()}
                   </div>
                 ) : (
-                  /* Public: non-interactive slot pills (day cell handles the click) */
+                  /* Public: slot pill labels (day cell handles the click) */
                   <div className="day-slots">
                     {dayEvents.slice(0, 4).map((ev, j) => {
                       const sc        = (ev.status || 'available').toLowerCase();

@@ -39,10 +39,7 @@ const formatDateTime = (iso) =>
     hour: 'numeric', minute: '2-digit', hour12: true,
   });
 
-const localDateKey = (iso) => {
-  const d = new Date(iso);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
+
 
 const stepVariants = {
   enter: (dir) => ({ opacity: 0, x: dir > 0 ? 28 : -28 }),
@@ -94,21 +91,24 @@ export default function Booking() {
     status: 'available',
   }));
 
-  const handleDayClick = useCallback(({ date, dateKey: dk }) => {
+  const handleDayClick = useCallback(({ date, events, dateKey }) => {
+    const slots = events
+      .filter((e) => e.status === 'available')
+      .map((e) => e.startTime)
+      .sort();
     const dateLabel = date.toLocaleDateString('en-US', {
-      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+      weekday: 'long', month: 'long', day: 'numeric',
     });
-    const slots = availableSlots.filter((iso) => localDateKey(iso) === dk);
-    setSelectedDay({ date, dateKey: dk, dateLabel, slots });
+    setSelectedDay({ dateKey, dateLabel, slots });
     if (window.innerWidth >= 641) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 100, behavior: 'smooth' });
     }
-  }, [availableSlots]);
+  }, []);
 
   const handleSlotSelect = (iso) => {
     setSelectedSlot(iso);
-    setBookingError(null);
     setSelectedDay(null);
+    setBookingError(null);
   };
 
   const handleFormChange = (e) => {
@@ -130,6 +130,7 @@ export default function Booking() {
   const goToStep = (step) => {
     setDirection(step > macroStep ? 1 : -1);
     setMacroStep(step);
+    setSelectedDay(null);
   };
 
   const selectedType = sessionTypes.find((t) => t.id === selectedTypeId);
@@ -355,22 +356,20 @@ export default function Booking() {
                     {selectedDay && (
                       <div className="slot-panel">
                         <div className="slot-panel-header">
-                          <button type="button" className="slot-panel-back" onClick={() => setSelectedDay(null)}>← Back</button>
-                          <h3 className="slot-panel-date">{selectedDay.dateLabel}</h3>
+                          <button className="slot-panel-back" onClick={() => setSelectedDay(null)}>← Back</button>
+                          <h3 className="slot-panel-title">{selectedDay.dateLabel}</h3>
                         </div>
                         {selectedDay.slots.length === 0 ? (
-                          <p className="slot-panel-empty">No available times for this day.</p>
+                          <p className="slot-panel-empty">No available slots for this day.</p>
                         ) : (
                           <div className="slot-panel-list">
-                            {selectedDay.slots.map((iso, i) => (
+                            {selectedDay.slots.map((iso) => (
                               <button
-                                key={i}
-                                type="button"
-                                className={`slot-option ${selectedSlot === iso ? 'selected' : ''}`}
+                                key={iso}
+                                className={`slot-option${selectedSlot === iso ? ' selected' : ''}`}
                                 onClick={() => handleSlotSelect(iso)}
                               >
-                                <span className="slot-option-time mono">{formatTime(iso)}</span>
-                                {selectedType && <span className="slot-option-dur">{selectedType.durationMinutes} min</span>}
+                                {formatTime(iso)}
                               </button>
                             ))}
                           </div>
@@ -378,7 +377,7 @@ export default function Booking() {
                       </div>
                     )}
 
-                    <div className={`calendar-wrapper ${selectedDay ? 'day-selected' : ''}`}>
+                    <div className={`calendar-wrapper${selectedDay ? ' day-selected' : ''}`}>
                       <CalendarView
                         events={calendarEvents}
                         onDayClick={handleDayClick}
@@ -394,7 +393,7 @@ export default function Booking() {
                     {errors.startTime && <p className="field-error">{errors.startTime}</p>}
                     {bookingError && <p className="error-message">{bookingError}</p>}
 
-                    <div className={`step-nav-buttons ${selectedDay ? 'slot-panel-active' : ''}`}>
+                    <div className={`step-nav-buttons${selectedDay ? ' slot-panel-active' : ''}`}>
                       <button type="button" className="step-back-btn" onClick={() => { goToStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>← Back</button>
                       <button type="button" className="cta-button" onClick={handleContinueFromDateTime}>
                         Continue
