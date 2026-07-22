@@ -39,12 +39,7 @@ const formatDateTime = (iso) =>
     hour: 'numeric', minute: '2-digit', hour12: true,
   });
 
-const localDateKey = (iso) => {
-  const d = new Date(iso);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
 
-const EMPTY_DAY_MODAL = { open: false, dateLabel: '', slots: [] };
 
 const stepVariants = {
   enter: (dir) => ({ opacity: 0, x: dir > 0 ? 28 : -28 }),
@@ -64,7 +59,7 @@ export default function Booking() {
   const [isSubmitting, setIsSubmitting]         = useState(false);
   const [fetchError, setFetchError]             = useState(null);
   const [bookingError, setBookingError]         = useState(null);
-  const [dayModal, setDayModal]                 = useState(EMPTY_DAY_MODAL);
+  const [selectedDay, setSelectedDay]           = useState(null);
   const [detailsStep, setDetailsStep]           = useState(1); // 1 = Contact Info, 2 = Fitness Intake
   const [macroStep, setMacroStep]               = useState(1);
   const [direction, setDirection]               = useState(1);
@@ -96,31 +91,25 @@ export default function Booking() {
     status: 'available',
   }));
 
-  const closeDayModal = useCallback(() => {
-    setDayModal(EMPTY_DAY_MODAL);
-    document.body.style.overflow = '';
+  const handleDayClick = useCallback(({ date, events, dateKey }) => {
+    const slots = events
+      .filter((e) => e.status === 'available')
+      .map((e) => e.startTime)
+      .sort();
+    const dateLabel = date.toLocaleDateString('en-US', {
+      weekday: 'long', month: 'long', day: 'numeric',
+    });
+    setSelectedDay({ dateKey, dateLabel, slots });
+    if (window.innerWidth >= 641) {
+      window.scrollTo({ top: 100, behavior: 'smooth' });
+    }
   }, []);
 
-  const openDayModal = useCallback(({ date, dateKey: dk }) => {
-    const dateLabel = date.toLocaleDateString('en-US', {
-      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-    });
-    const slots = availableSlots.filter((iso) => localDateKey(iso) === dk);
-    setDayModal({ open: true, dateLabel, slots });
-    document.body.style.overflow = 'hidden';
-  }, [availableSlots]);
-
-  const handleModalSlotSelect = (iso) => {
+  const handleSlotSelect = (iso) => {
     setSelectedSlot(iso);
+    setSelectedDay(null);
     setBookingError(null);
-    closeDayModal();
   };
-
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') closeDayModal(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [closeDayModal]);
 
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -141,6 +130,7 @@ export default function Booking() {
   const goToStep = (step) => {
     setDirection(step > macroStep ? 1 : -1);
     setMacroStep(step);
+    setSelectedDay(null);
   };
 
   const selectedType = sessionTypes.find((t) => t.id === selectedTypeId);
@@ -363,20 +353,47 @@ export default function Booking() {
                       </div>
                     )}
 
-                    <CalendarView
-                      events={calendarEvents}
-                      onDayClick={openDayModal}
-                      selectedSlot={selectedSlot}
-                      mode="public"
-                      loading={loadingSlots}
-                    />
+                    {selectedDay && (
+                      <div className="slot-panel">
+                        <div className="slot-panel-header">
+                          <button className="slot-panel-back" onClick={() => setSelectedDay(null)}>← Back</button>
+                          <h3 className="slot-panel-title">{selectedDay.dateLabel}</h3>
+                        </div>
+                        {selectedDay.slots.length === 0 ? (
+                          <p className="slot-panel-empty">No available slots for this day.</p>
+                        ) : (
+                          <div className="slot-panel-list">
+                            {selectedDay.slots.map((iso) => (
+                              <button
+                                key={iso}
+                                className={`slot-option${selectedSlot === iso ? ' selected' : ''}`}
+                                onClick={() => handleSlotSelect(iso)}
+                              >
+                                {formatTime(iso)}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className={`calendar-wrapper${selectedDay ? ' day-selected' : ''}`}>
+                      <CalendarView
+                        events={calendarEvents}
+                        onDayClick={handleDayClick}
+                        selectedSlot={selectedSlot}
+                        selectedDateKey={selectedDay?.dateKey}
+                        mode="public"
+                        loading={loadingSlots}
+                      />
+                    </div>
                     {!loadingSlots && availableSlots.length === 0 && (
                       <p className="calendar-hint">No available slots in this period. Try navigating to a future month.</p>
                     )}
                     {errors.startTime && <p className="field-error">{errors.startTime}</p>}
                     {bookingError && <p className="error-message">{bookingError}</p>}
 
-                    <div className="step-nav-buttons">
+                    <div className={`step-nav-buttons${selectedDay ? ' slot-panel-active' : ''}`}>
                       <button type="button" className="step-back-btn" onClick={() => { goToStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>← Back</button>
                       <button type="button" className="cta-button" onClick={handleContinueFromDateTime}>
                         Continue
@@ -658,33 +675,6 @@ export default function Booking() {
             </div>
           </form>
 
-          {dayModal.open && (
-            <div className="modal-overlay" onClick={closeDayModal}>
-              <div className="modal-card day-slots-modal" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={closeDayModal} aria-label="Close">✕</button>
-                <div className="day-modal-header">
-                  <h2>Available Times</h2>
-                  <p>{dayModal.dateLabel}</p>
-                </div>
-                <div className="day-slot-list">
-                  {dayModal.slots.length === 0 ? (
-                    <p className="day-slot-empty">No available slots for this day.</p>
-                  ) : (
-                    dayModal.slots.map((iso, i) => (
-                      <button
-                        key={i}
-                        className={`day-slot-row available ${selectedSlot === iso ? 'day-slot-row-selected' : ''}`}
-                        onClick={() => handleModalSlotSelect(iso)}
-                      >
-                        <span className="day-slot-time mono">{formatTime(iso)}</span>
-                        <span className="status-badge available">{selectedType?.durationMinutes} min</span>
-                      </button>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
         </>
       )}
     </main>

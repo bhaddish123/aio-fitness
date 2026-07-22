@@ -543,7 +543,8 @@
   background-color: var(--gray-100);
 }
 
-.calendar-day.day-selected {
+.calendar-day.day-selected,
+.calendar-day.active-day {
   background-color: var(--blue-light);
   outline: 2px solid var(--blue);
   outline-offset: -2px;
