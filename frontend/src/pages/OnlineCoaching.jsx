@@ -16,27 +16,45 @@ function AnimatedSection({ className = '', as: Tag = 'section', delay, children,
 
 const TIERS = [
   {
-    id: 'monthly',
+    id: 'aio-coaching',
     badge: 'Most Popular',
-    name: 'Monthly Online Coaching',
-    price: '$300',
-    per: '/month*',
-    tagline: 'Ongoing coaching, accountability, and support — fully remote.',
+    name: 'All In One Coaching',
+    price: '$500',
+    per: '/month',
+    tagline: 'Comprehensive coaching that covers every dimension of your health — fully remote.',
     includes: [
-      'Fully customized training program',
-      'Program updates and adjustments as needed',
-      'Video form review and technique feedback',
-      'Messaging support for questions, accountability, and guidance',
-      'Basic nutrition guidance and habit coaching',
-      '1 monthly 30-minute Zoom or FaceTime check-in',
-      'Exercise substitutions based on injuries, equipment, or travel',
-      'Progress tracking and accountability support',
-      'Recovery, intensity, progression, and deload guidance',
+      'Customized programming',
+      'Program updates',
+      'Two coaching calls/month',
+      'Accountability',
+      'Nutrition guidance',
+      'Messaging',
+      'Form review',
+      'Community',
+      'Complimentary virtual workout',
     ],
-    bonus: 'First virtual personal training session free ($100 value)',
-    cta: 'Start Monthly Coaching',
-    ctaHref: '/coaching/apply?package=monthly',
+    bonus: null,
+    cta: 'Apply Now',
+    ctaHref: '/coaching/apply?package=aio-coaching',
     highlight: true,
+  },
+  {
+    id: 'program',
+    badge: null,
+    name: 'Custom Training Program',
+    price: '$200',
+    per: ' one-time',
+    tagline: 'A fully personalized training plan built around your goals, equipment, and schedule.',
+    includes: [
+      'Personalized program',
+      'Trainerize app',
+      'Exercise library',
+      'Onboarding',
+    ],
+    bonus: null,
+    cta: 'Get Started',
+    ctaHref: '/coaching/apply?package=program',
+    highlight: false,
   },
   {
     id: 'virtual',
@@ -50,30 +68,11 @@ const TIERS = [
       'Real-time exercise corrections and cueing',
       'Workout guidance and pacing',
       'Exercise substitutions when needed',
-      'Flexible training from home, hotel gyms, or commercial gyms',
+      'Flexible — home, hotel gym, or commercial gym',
     ],
     bonus: null,
     cta: 'Book a Virtual Session',
     ctaHref: '/booking',
-    highlight: false,
-  },
-  {
-    id: 'program',
-    badge: null,
-    name: 'One-Time Customized Program',
-    price: '$150',
-    per: ' one-time',
-    tagline: 'A complete, structured training plan built around your goals.',
-    includes: [
-      'Customized workout split and exercise selection',
-      'Sets, reps, intensity, and progression guidance',
-      'Exercise substitutions if needed',
-      'Warm-up and mobility recommendations',
-      'Basic coaching notes and training instructions',
-    ],
-    bonus: null,
-    cta: 'Get Your Program',
-    ctaHref: '/coaching/apply?package=program',
     highlight: false,
   },
 ];
@@ -120,7 +119,14 @@ export default function OnlineCoaching() {
             </div>
           ))}
         </div>
-        <p className="coaching-pricing-note">* Monthly coaching pricing is being finalized. Reach out directly for current rates.</p>
+        <div className="coaching-addons">
+          <h3 className="coaching-addons-heading">Additional Services</h3>
+          <p className="coaching-addons-sub">
+            30-minute coaching calls, nutrition plan add-ons, and single session packages are available.{' '}
+            <a href="mailto:everettleefitness@gmail.com" className="coaching-inline-link">Reach out directly</a>{' '}
+            to discuss what fits your needs.
+          </p>
+        </div>
       </AnimatedSection>
 
       <AnimatedSection className="coaching-philosophy">

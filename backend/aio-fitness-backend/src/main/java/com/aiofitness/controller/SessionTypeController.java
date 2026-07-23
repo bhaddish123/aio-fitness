@@ -21,6 +21,6 @@ public class SessionTypeController {
 
     @GetMapping
     public ResponseEntity<List<SessionType>> getSessionTypes() {
-        return ResponseEntity.ok(sessionTypeRepository.findAll());
+        return ResponseEntity.ok(sessionTypeRepository.findByActiveTrue());
     }
 }

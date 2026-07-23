@@ -21,7 +21,7 @@ const DEFAULT_FAQ_ITEMS = [
   {
     id: '4',
     question: 'How do I get started?',
-    answer: 'Click "Book Now" in the navigation, select your coaching option, pick a time for your kickoff call, fill in your details, and complete payment via Stripe.',
+    answer: 'Click "Free Consultation" in the navigation, pick a time that works for you, and fill out a short intake form. The consultation is completely free — no payment required. After your call, Everett will follow up with a personalized coaching recommendation.',
   },
   {
     id: '5',
@@ -31,17 +31,32 @@ const DEFAULT_FAQ_ITEMS = [
   {
     id: '6',
     question: 'What is your cancellation policy?',
-    answer: 'Cancel more than 24 hours before a scheduled call for a full refund. Cancellations within 24 hours are non-refundable. No-shows are non-refundable.',
+    answer: 'For paid sessions like Virtual Personal Training, cancel more than 24 hours before your scheduled call for a full refund. Cancellations within 24 hours are non-refundable. No-shows are non-refundable. The free consultation has no cancellation fee.',
   },
   {
     id: '7',
     question: 'How far in advance can I book?',
-    answer: 'Calls must be booked at least 6 hours in advance.',
+    answer: 'Sessions must be booked at least 6 hours in advance.',
   },
   {
     id: '8',
     question: 'What happens after I book?',
-    answer: 'You will receive a confirmation email with your call details and a cancellation link, plus access to your digital coaching dashboard.',
+    answer: "You'll receive a confirmation email with your appointment details. After your free consultation, Everett will reach out with a coaching recommendation. Paid coaching clients get access to the Trainerize app where your program, exercise library, and progress tracking live.",
+  },
+  {
+    id: '9',
+    question: 'Does coaching include nutrition guidance?',
+    answer: 'Yes — All In One Coaching includes nutrition guidance as part of the monthly package. This covers dietary recommendations, eating habits, and adjustments as your goals evolve. The Custom Training Program focuses on programming; nutrition guidance is available as a separate add-on.',
+  },
+  {
+    id: '10',
+    question: "I'm a complete beginner — is this right for me?",
+    answer: "Absolutely. Coaching is built around your current starting point, whether that's day one or year ten. Beginners get detailed onboarding, exercise guidance with form cues, and a program designed to build safely from the ground up.",
+  },
+  {
+    id: '11',
+    question: 'How do I communicate with my coach between sessions?',
+    answer: 'All In One Coaching clients have direct messaging access to Everett for questions, form checks, and check-ins throughout the month, plus two scheduled coaching calls per month. Custom Training Program clients can reach out via email for onboarding questions.',
   },
 ];
 

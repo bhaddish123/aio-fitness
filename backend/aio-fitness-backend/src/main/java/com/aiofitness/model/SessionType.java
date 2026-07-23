@@ -35,6 +35,12 @@ public class SessionType {
         return price;
     }
 
+    private Boolean active = true;
+
+    public Boolean getActive() {
+        return active;
+    }
+
     public UUID getId() {
         return id;
     }

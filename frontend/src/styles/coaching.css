@@ -228,6 +228,35 @@
   color: #e8c84a;
 }
 
+/* Standalone / add-on services note */
+.coaching-addons {
+  margin-top: 48px;
+  padding: 24px 32px;
+  background: var(--gradient-section);
+  border: 1px solid var(--gray-200);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--radius);
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.coaching-addons-heading {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--blue);
+  margin: 0 0 8px;
+}
+
+.coaching-addons-sub {
+  font-size: 15px;
+  color: var(--gray-600);
+  line-height: 1.65;
+  margin: 0;
+}
+
 /* ── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .coaching-tier-grid {

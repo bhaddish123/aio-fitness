@@ -3,16 +3,10 @@ import { API_BASE_URL } from '../utils/constants';
 import { useInView } from '../hooks/useInView';
 
 const DEFAULT_BIO =
-  "Everett Lee, M.S. in Sports Science & Exercise Psychology. Trained at Life Time Inc., one of " +
-  "the country's most respected fitness brands, with additional experience supporting elite " +
-  "athletes at the Philadelphia Union, I bring evidence-based, science-backed remote programming " +
-  "to clients worldwide — independently, on my own terms.";
+  "I wasn't always confident in my body. Growing up, I was bullied and struggled with anorexia, " +
+  "graduating high school at just 105 pounds. Strength training changed everything — and that " +
+  "transformation is why I became a coach.";
 
-const DEFAULT_TESTIMONIALS = [
-  { id: '1', quote: "Everett's approach is unlike any trainer I've worked with before.", author: 'Sarah M.' },
-  { id: '2', quote: 'Lost 30 lbs and kept it off. This changed my life.',            author: 'Marcus T.' },
-  { id: '3', quote: 'I finally feel confident in the gym thanks to Everett.',            author: 'Priya K.'  },
-];
 
 function getInitials(name) {
   return name
@@ -42,7 +36,7 @@ const PHOTO_CACHE_KEY = 'aio_fitness_trainer_photo';
 export default function About() {
   const [bio, setBio]                   = useState(DEFAULT_BIO);
   const [photo, setPhoto]               = useState(() => localStorage.getItem(PHOTO_CACHE_KEY) || '');
-  const [testimonials, setTestimonials] = useState(DEFAULT_TESTIMONIALS);
+  const [testimonials, setTestimonials] = useState([]);
   const introLagRef = useRef(null);
 
   // Counter-parallax "lag" on the text column — settles down and fades
@@ -121,55 +115,72 @@ export default function About() {
       <Animated className="my-journey">
         <h2>My Journey</h2>
         <p>
-          My path into coaching started with formal training — an M.S. in Sports
-          Science &amp; Exercise Psychology, hands-on experience at Life Time Inc.,
-          and time spent supporting elite athletes with the Philadelphia Union.
-          That foundation is what I now bring independently to every client, fully
-          remote.
+          I wasn't always confident in my body. Growing up, I was bullied because of how I looked
+          and struggled with anorexia, graduating high school at just 105 pounds.
         </p>
         <p>
-          Today I work with clients of all fitness levels — from beginners to
-          competitive athletes — crafting individualized programs that get real results.
+          I hated taking my shirt off and wore hoodies and long sleeves for years because I was
+          embarrassed by my body. I felt weak, had little confidence, low energy, and didn't
+          understand nutrition or how to improve my health. More than anything, I felt stuck and
+          helpless.
+        </p>
+        <p>
+          Strength training changed everything. Over the following years I gained more than 60
+          pounds, transformed my body, rebuilt my confidence, and discovered that fitness is about
+          far more than appearance. It improves your energy, mindset, resilience, relationships,
+          and quality of life.
+        </p>
+        <p>
+          That journey inspired me to earn degrees in Exercise Science and Sport &amp; Exercise
+          Psychology and dedicate my career to helping others experience the same transformation.
+        </p>
+        <p>
+          Today my mission is simple: Help people become stronger, healthier, more confident, and
+          live longer by building habits that last for life.
         </p>
       </Animated>
 
       <Animated className="training-philosophy">
-        <h2>Coaching Methodology</h2>
+        <h2>My Philosophy</h2>
+        <p className="philosophy-lead">Exercise can change lives.</p>
+        <p className="philosophy-lead">It improves physical health, mental health, confidence, energy, independence, and longevity.</p>
         <div className="philosophy-points">
           <Animated as="div" className="philosophy-item" delay="1">
-            <h3>Data-Driven</h3>
-            <p>Programming based on physiology and performance metrics.</p>
+            <h3>More Than Muscle</h3>
+            <p>My goal isn't simply to help you lose weight or build muscle. It's to help you create a lifestyle where taking care of yourself becomes part of who you are.</p>
           </Animated>
           <Animated as="div" className="philosophy-item" delay="2">
-            <h3>Sustainable</h3>
-            <p>Focused on long-term habit change.</p>
+            <h3>Fitness as a Lifestyle</h3>
+            <p>When fitness becomes a lifestyle, everything else improves — energy, confidence, relationships, resilience, and quality of life.</p>
           </Animated>
           <Animated as="div" className="philosophy-item" delay="3">
-            <h3>Personalized</h3>
-            <p>Tailored nutrition and training plans for your specific lifestyle.</p>
+            <h3>Lasting Transformation</h3>
+            <p>I don't coach quick fixes. I coach sustainable change — building habits and systems that keep you healthy, active, and confident for decades.</p>
           </Animated>
         </div>
       </Animated>
 
-      <Animated className="client-testimonials">
-        <h2>Client Testimonials</h2>
-        <div className="testimonials-grid">
-          {testimonials.map((t, i) => (
-            <Animated as="div" key={i} className="testimonial-card" delay={i + 1}>
-              <p>"{t.quote}"</p>
-              <div className="testimonial-author-row">
-                <span className="testimonial-avatar" aria-hidden="true">{getInitials(t.author)}</span>
-                <span className="testimonial-author-name">{t.author}</span>
-              </div>
-            </Animated>
-          ))}
-        </div>
-      </Animated>
+      {testimonials.length > 0 && (
+        <Animated className="client-testimonials">
+          <h2>Client Testimonials</h2>
+          <div className="testimonials-grid">
+            {testimonials.map((t, i) => (
+              <Animated as="div" key={i} className="testimonial-card" delay={i + 1}>
+                <p>"{t.quote}"</p>
+                <div className="testimonial-author-row">
+                  <span className="testimonial-avatar" aria-hidden="true">{getInitials(t.author)}</span>
+                  <span className="testimonial-author-name">{t.author}</span>
+                </div>
+              </Animated>
+            ))}
+          </div>
+        </Animated>
+      )}
 
       <Animated className="about-cta">
-        <h2>Ready to Start?</h2>
+        <h2>Ready to Transform Your Body, Mindset, and Lifestyle?</h2>
         <a href="/booking">
-          <button className="cta-button">Book a Session</button>
+          <button className="cta-button">Book a Free Consultation</button>
         </a>
       </Animated>
 

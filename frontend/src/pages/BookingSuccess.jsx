@@ -5,7 +5,7 @@ export default function BookingSuccess() {
     <main style={{ textAlign: 'center', padding: '120px 32px' }}>
       <h1 style={{ fontSize: 40, fontWeight: 800, marginBottom: 16 }}>You're booked!</h1>
       <p style={{ fontSize: 18, color: '#666', marginBottom: 40, lineHeight: 1.6 }}>
-        Payment confirmed. Check your email for your session details.
+        Confirmation details have been sent to your email. Everett will be in touch before your session.
       </p>
       <Link to="/">
         <button className="cta-button">Back to Home</button>

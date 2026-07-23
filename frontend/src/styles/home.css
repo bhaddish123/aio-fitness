@@ -124,14 +124,13 @@
 
 .hero-title {
   font-family: var(--font-display);
-  /* Bounded by both vw and vh — on a short-but-wide viewport (e.g. a
-     landscape laptop window), a vw-only size stays huge regardless of
-     how little vertical room is left, pushing this bottom-anchored
-     block up into the fixed nav. min() makes the smaller axis win. */
-  font-size: clamp(56px, min(11vw, 15vh), 150px);
+  /* Three sentence-length spans need a smaller clamp than the old two-word
+     "Everett / Lee" display — keeping min() so landscape-short viewports
+     don't push the bottom-anchored block into the nav. */
+  font-size: clamp(28px, min(5.5vw, 8.5vh), 68px);
   color: #ffffff;
   margin: 0;
-  line-height: 0.92;
+  line-height: 1.0;
   letter-spacing: 0;
   text-transform: uppercase;
   opacity: 0;
@@ -171,9 +170,46 @@
 }
 
 .hero-cta-wrap {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
   align-self: flex-start;
   opacity: 0;
   animation: fadeInScale 600ms cubic-bezier(0.34, 1.56, 0.64, 1) 300ms both;
+}
+
+/* Sub-headline below the tagline */
+.hero-sub {
+  font-size: clamp(14px, 1.5vw, 17px);
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 520px;
+  line-height: 1.65;
+  margin: 20px 0 36px;
+  opacity: 0;
+  animation: slideUp 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 150ms both;
+}
+
+/* Outline/ghost variant — secondary hero CTA */
+.cta-button-outline {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.9rem 2rem;
+  border: 2px solid rgba(212, 175, 55, 0.7);
+  border-radius: var(--radius);
+  background: transparent;
+  color: rgba(212, 175, 55, 0.9);
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
+}
+
+.cta-button-outline:hover {
+  border-color: var(--blue);
+  color: var(--navy);
+  background: var(--blue);
 }
 
 @keyframes slideUp {
@@ -770,4 +806,440 @@
   font-size: 15px;
   font-weight: 600;
   color: var(--blue);
+}
+
+/* ── Shared section layout helpers ──────────────────────────── */
+.section-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.section-heading {
+  font-size: clamp(28px, 3.5vw, 42px);
+  color: var(--gray-900);
+  text-align: center;
+  margin: 0 0 3rem;
+  letter-spacing: 0.03em;
+}
+
+.section-sub {
+  text-align: center;
+  font-size: 16px;
+  color: var(--gray-500);
+  margin: -1.5rem 0 2.5rem;
+  font-style: italic;
+}
+
+/* ── Section 2: Why All In One? ─────────────────────────────── */
+.why-aio {
+  background: var(--navy);
+  padding: 96px 32px;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.why-aio-inner {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.why-aio-inner h2 {
+  font-size: clamp(28px, 3.5vw, 42px);
+  color: var(--gray-900);
+  margin: 0 0 2rem;
+}
+
+.why-aio-inner p {
+  font-size: 17px;
+  color: var(--gray-600);
+  line-height: 1.75;
+  margin-bottom: 16px;
+}
+
+.why-aio-tagline {
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: 20px !important;
+  color: var(--blue) !important;
+  margin-top: 24px !important;
+  margin-bottom: 0 !important;
+}
+
+/* ── Section 3: What We Build Together ──────────────────────── */
+.what-we-build {
+  background: var(--navy-mid);
+  padding: 96px 32px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.build-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.build-card {
+  background: var(--gradient-section);
+  border: 1px solid var(--gray-200);
+  border-top: 3px solid var(--blue);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.build-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
+}
+
+.build-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--blue-light);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: var(--blue);
+  margin-bottom: 18px;
+}
+
+.build-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.build-card h3 {
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gray-900);
+  margin-bottom: 10px;
+}
+
+.build-card p {
+  font-size: 14px;
+  color: var(--gray-600);
+  line-height: 1.65;
+}
+
+@media (max-width: 900px) {
+  .build-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .build-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Section 4: How Coaching Works ──────────────────────────── */
+.how-it-works {
+  background: var(--navy);
+  padding: 96px 32px;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.steps-timeline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  gap: 0;
+}
+
+/* Connecting line between step circles */
+.steps-timeline::before {
+  content: '';
+  position: absolute;
+  top: 27px;
+  left: calc(10% + 27px);
+  right: calc(10% + 27px);
+  height: 2px;
+  background: rgba(212, 175, 55, 0.22);
+}
+
+.step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  padding: 0 8px;
+}
+
+.step-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--blue-light);
+  border: 2px solid var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--blue);
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.step-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-600);
+  line-height: 1.4;
+  max-width: 120px;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .steps-timeline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .steps-timeline::before { display: none; }
+  .step {
+    flex-direction: row;
+    text-align: left;
+    gap: 16px;
+  }
+  .step-circle { flex-shrink: 0; margin-bottom: 0; }
+  .step-label  { max-width: none; }
+}
+
+/* ── Section 5: Coaching Services ───────────────────────────── */
+.services-preview {
+  background: var(--navy-mid);
+  padding: 96px 32px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.service-card {
+  background: var(--gradient-section);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 40px 36px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
+}
+
+.service-card.featured {
+  border-color: var(--blue);
+  border-width: 2px;
+}
+
+.service-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--navy);
+  background: var(--blue);
+  border-radius: 4px;
+  padding: 4px 10px;
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.service-card h3 {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.service-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.service-price-amount {
+  font-family: var(--font-mono);
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--blue);
+  line-height: 1;
+}
+
+.service-price-period {
+  font-size: 15px;
+  color: var(--gray-600);
+}
+
+.service-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.service-features li {
+  font-size: 14px;
+  color: var(--gray-600);
+  padding-left: 20px;
+  position: relative;
+}
+
+.service-features li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.svc-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .services-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Section 6: Client Transformations ──────────────────────── */
+.client-transformations {
+  background: var(--navy);
+  padding: 96px 32px;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.client-transformations .section-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+/* Reuse testimonials-grid / testimonial-card styles — same visual treatment */
+.client-transformations .testimonials-grid {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.transformations-placeholder {
+  text-align: center;
+  padding: 64px 24px;
+  border: 1px dashed rgba(212, 175, 55, 0.25);
+  border-radius: var(--radius);
+  margin-top: 32px;
+}
+
+.transformations-placeholder-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin: 0 0 10px;
+}
+
+.transformations-placeholder-sub {
+  font-size: 15px;
+  color: var(--gray-600);
+  margin: 0;
+}
+
+/* ── Section 8: Education & Experience ──────────────────────── */
+.edu-experience {
+  background: var(--navy-mid);
+  padding: 96px 32px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.edu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.edu-item {
+  background: var(--gradient-section);
+  border: 1px solid var(--gray-200);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.edu-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(212, 175, 55, 0.18);
+}
+
+.edu-type {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--blue);
+}
+
+.edu-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-900);
+  line-height: 1.35;
+}
+
+.edu-sub {
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+@media (max-width: 860px) {
+  .edu-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+  .edu-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Section 10: Final CTA ───────────────────────────────────── */
+.home-cta {
+  background: var(--navy);
+  padding: 120px 32px;
+  border-top: 1px solid rgba(212, 175, 55, 0.3);
+  text-align: center;
+}
+
+.home-cta h2 {
+  font-size: clamp(26px, 4vw, 46px);
+  color: var(--gray-900);
+  margin: 0 auto 2.5rem;
+  max-width: 680px;
+  line-height: 1.2;
 }

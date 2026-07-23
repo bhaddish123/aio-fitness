@@ -125,11 +125,32 @@ public class BookingService {
         booking.setReservedUntil(Instant.now().plusSeconds(300));
         booking.setCancellationToken(UUID.randomUUID().toString());
 
+        Booking saved;
         try {
-            return bookingRepository.save(booking);
+            saved = bookingRepository.save(booking);
         } catch (DataIntegrityViolationException e) {
             throw new RuntimeException("Time slot already booked");
         }
+
+        // Free sessions (e.g. Complimentary Consultation) skip Stripe entirely:
+        // confirm immediately and trigger the same post-payment actions the
+        // Stripe webhook would normally fire.
+        if (sessionType.getPrice().compareTo(java.math.BigDecimal.ZERO) == 0) {
+            saved.setStatus(BookingStatus.CONFIRMED);
+            saved = bookingRepository.save(saved);
+            try {
+                emailService.sendConfirmation(saved);
+            } catch (Exception e) {
+                log.error("Failed to send confirmation email for free booking {}: {}", saved.getId(), e.getMessage(), e);
+            }
+            String eventId = calendarService.createEvent(saved);
+            if (eventId != null) {
+                saved.setGoogleCalendarEventId(eventId);
+                saved = bookingRepository.save(saved);
+            }
+        }
+
+        return saved;
     }
 
     public void confirmStripePayment(String stripeSessionId) {

@@ -153,6 +153,14 @@
   max-width: 700px;
 }
 
+.philosophy-lead {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
 .philosophy-points {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

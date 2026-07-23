@@ -117,14 +117,14 @@ export default function Navigation() {
               to="/booking"
               className="nav-links-mobile-cta"
               onClick={() => handleNav('/booking')}
-            >Book Now</Link>
+            >Free Consultation</Link>
           </div>
         </div>
 
         {/* Right — isolated CTA focal point + hamburger */}
         <div className="nav-right">
           <Link to="/booking" className="nav-cta" onClick={() => handleNav('/booking')}>
-            Book Now
+            Free Consultation
           </Link>
           <button
             className={`nav-hamburger ${menuOpen ? 'open' : ''}`}
