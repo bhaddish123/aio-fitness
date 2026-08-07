@@ -37,7 +37,8 @@ public class SecurityConfig {
                     "/session-types/**",
                     "/content/**",
                     "/inquiries/**",
-                    "/admin/login"
+                    "/admin/login",
+                    "/admin/dev/**"
                 ).permitAll()
                 .requestMatchers("/admin/**").authenticated()
                 .anyRequest().denyAll()

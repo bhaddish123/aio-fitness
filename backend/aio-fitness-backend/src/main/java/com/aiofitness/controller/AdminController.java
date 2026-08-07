@@ -9,9 +9,11 @@ import com.aiofitness.repository.AvailabilityRuleRepository;
 import com.aiofitness.repository.BookingRepository;
 import com.aiofitness.repository.ScheduleOverrideRepository;
 import com.aiofitness.service.BookingService;
+import com.aiofitness.service.EmailService;
 import com.aiofitness.service.LoginAttemptService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,7 @@ public class AdminController {
     private final AvailabilityRuleRepository availabilityRuleRepository;
     private final ScheduleOverrideRepository scheduleOverrideRepository;
     private final BookingService bookingService;
+    private final EmailService emailService;
     private final JwtUtil jwtUtil;
     private final LoginAttemptService loginAttemptService;
 
@@ -40,14 +43,23 @@ public class AdminController {
                            AvailabilityRuleRepository availabilityRuleRepository,
                            ScheduleOverrideRepository scheduleOverrideRepository,
                            BookingService bookingService,
+                           EmailService emailService,
                            JwtUtil jwtUtil,
                            LoginAttemptService loginAttemptService) {
         this.bookingRepository = bookingRepository;
         this.availabilityRuleRepository = availabilityRuleRepository;
         this.scheduleOverrideRepository = scheduleOverrideRepository;
         this.bookingService = bookingService;
+        this.emailService = emailService;
         this.jwtUtil = jwtUtil;
         this.loginAttemptService = loginAttemptService;
+    }
+
+    /** GET /admin/dev/email-preview?type=confirmation — renders email HTML in the browser for design review. Remove before final deploy. */
+    @GetMapping(value = "/dev/email-preview", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> emailPreview(@RequestParam(defaultValue = "confirmation") String type) {
+        String html = emailService.previewHtml(type);
+        return ResponseEntity.ok(html);
     }
 
     /* ── Auth ──────────────────────────────────────────────────── */
