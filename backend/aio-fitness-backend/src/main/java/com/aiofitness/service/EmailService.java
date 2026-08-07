@@ -28,7 +28,7 @@ public class EmailService {
     private static final String LOCATION   = "Devon, PA";
     private static final String PHONE      = "(215) 970-1446";
     private static final String EMAIL      = "everettleefitness@gmail.com";
-    private static final String LOGO_URL   = SITE_URL + "/logo.png";
+    private static final String LOGO_URL   = "https://i.imgur.com/QiuHwns.png";
     private static final String FB_URL     = "https://www.facebook.com/profile.php?id=100087637025380";
     private static final String IG_URL     = "https://www.instagram.com/everettxlee/";
     private static final String LI_URL     = "https://www.linkedin.com/in/everett-lee-661a56172/";
