@@ -115,7 +115,7 @@
   .about-hero {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-    margin-top: -64px;
+    margin-top: 0;
   }
 
   .about-hero-image {
