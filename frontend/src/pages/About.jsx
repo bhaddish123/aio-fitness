@@ -8,16 +8,6 @@ const DEFAULT_BIO =
   "transformation is why I became a coach.";
 
 
-function getInitials(name) {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-}
-
 function Animated({ as: Tag = 'section', className = '', delay, children, ...props }) {
   const [ref, inView] = useInView();
   return (
@@ -36,7 +26,6 @@ const PHOTO_CACHE_KEY = 'aio_fitness_trainer_photo';
 export default function About() {
   const [bio, setBio]                   = useState(DEFAULT_BIO);
   const [photo, setPhoto]               = useState(() => localStorage.getItem(PHOTO_CACHE_KEY) || '');
-  const [testimonials, setTestimonials] = useState([]);
   const introLagRef = useRef(null);
 
   // Counter-parallax "lag" on the text column — settles down and fades
@@ -79,12 +68,6 @@ export default function About() {
         if (data['about.photo']) {
           setPhoto(data['about.photo']);
           localStorage.setItem(PHOTO_CACHE_KEY, data['about.photo']);
-        }
-        if (data.testimonials) {
-          try {
-            const parsed = JSON.parse(data.testimonials);
-            if (parsed.length) setTestimonials(parsed);
-          } catch {}
         }
       })
       .catch(() => {});
@@ -159,23 +142,6 @@ export default function About() {
           </Animated>
         </div>
       </Animated>
-
-      {testimonials.length > 0 && (
-        <Animated className="client-testimonials">
-          <h2>Client Testimonials</h2>
-          <div className="testimonials-grid">
-            {testimonials.map((t, i) => (
-              <Animated as="div" key={i} className="testimonial-card" delay={i + 1}>
-                <p>"{t.quote}"</p>
-                <div className="testimonial-author-row">
-                  <span className="testimonial-avatar" aria-hidden="true">{getInitials(t.author)}</span>
-                  <span className="testimonial-author-name">{t.author}</span>
-                </div>
-              </Animated>
-            ))}
-          </div>
-        </Animated>
-      )}
 
       <Animated className="about-cta">
         <h2>Ready to Transform Your Body, Mindset, and Lifestyle?</h2>

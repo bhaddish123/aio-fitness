@@ -28,6 +28,9 @@ spring:
           auth: true
           starttls:
             enable: true
+  jackson:
+    stream-read-constraints:
+      max-string-length: 104857600  # 100 MB — base64-encoded videos can exceed Jackson's 20 MB default
 
 stripe:
   api:
@@ -63,5 +66,5 @@ google:
 server:
   port: 8080
   tomcat:
-    max-http-form-post-size: 15MB
-    max-swallow-size: 15MB
+    max-http-form-post-size: -1      # unlimited for JSON bodies containing base64
+    max-swallow-size: -1

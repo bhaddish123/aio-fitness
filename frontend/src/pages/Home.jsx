@@ -82,10 +82,6 @@ const EDU_ITEMS = [
   { type: 'Experience',    label: 'Personal Trainer & Online Coach',             sub: 'Life Time Inc.' },
 ];
 
-function getInitials(name) {
-  return name.split(' ').filter(Boolean).map((p) => p[0]).join('').slice(0, 2).toUpperCase();
-}
-
 function AnimatedSection({ className, children }) {
   const [ref, inView] = useInView();
   return (
@@ -98,12 +94,34 @@ function AnimatedSection({ className, children }) {
   );
 }
 
+function TrimmedVideo({ src, trimStart, trimEnd, ...props }) {
+  const ref = useRef(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    const onMeta = () => { v.currentTime = trimStart ?? 0; };
+    const onTime = () => {
+      const end = trimEnd ?? v.duration;
+      if (v.currentTime >= end) v.currentTime = trimStart ?? 0;
+    };
+    v.addEventListener('loadedmetadata', onMeta);
+    v.addEventListener('timeupdate', onTime);
+    return () => {
+      v.removeEventListener('loadedmetadata', onMeta);
+      v.removeEventListener('timeupdate', onTime);
+    };
+  }, [trimStart, trimEnd]);
+  if (failed) return <div className="transformation-video-error">Video unavailable — unsupported format</div>;
+  return <video ref={ref} src={src} onError={() => setFailed(true)} {...props} />;
+}
+
 export default function Home() {
   const [heroPhoto, setHeroPhoto]           = useState(() => localStorage.getItem(PHOTO_CACHE_KEY)       || '');
   const [heroVideo, setHeroVideo]           = useState(() => localStorage.getItem(VIDEO_CACHE_KEY)       || '');
   const [heroVideoError, setHeroVideoError] = useState(false);
   const [focusPhoto, setFocusPhoto]         = useState(() => localStorage.getItem(FOCUS_PHOTO_CACHE_KEY) || '');
-  const [testimonials, setTestimonials]     = useState([]);
+  const [transformations, setTransformations] = useState([]);
   const [faqPreview, setFaqPreview]         = useState(DEFAULT_FAQ_PREVIEW);
   const [scrolledPastHero, setScrolledPastHero] = useState(false);
 
@@ -165,10 +183,10 @@ export default function Home() {
           setFocusPhoto(data['home.focusPhoto']);
           localStorage.setItem(FOCUS_PHOTO_CACHE_KEY, data['home.focusPhoto']);
         }
-        if (data.testimonials) {
+        if (data['home.transformations']) {
           try {
-            const parsed = JSON.parse(data.testimonials);
-            if (parsed.length) setTestimonials(parsed);
+            const parsed = JSON.parse(data['home.transformations']);
+            if (parsed.length) setTransformations(parsed);
           } catch {}
         }
         if (data.faqs) {
@@ -348,16 +366,24 @@ export default function Home() {
       {/* ── Section 6: Client Transformations ─────────────────── */}
       <AnimatedSection className="client-transformations">
         <div className="section-inner">
-          <h2 className="section-heading">Client Transformations</h2>
-          {testimonials.length > 0 ? (
-            <div className="testimonials-grid">
-              {testimonials.map((t, i) => (
-                <div className="testimonial-card" key={i}>
-                  <p>"{t.quote}"</p>
-                  <div className="testimonial-author-row">
-                    <span className="testimonial-avatar" aria-hidden="true">{getInitials(t.author)}</span>
-                    <span className="testimonial-author-name">{t.author}</span>
+          <h2 className="section-heading">Client Results</h2>
+          {transformations.length > 0 ? (
+            <div className="transformation-gallery">
+              {transformations.map((t) => (
+                <div key={t.id} className="transformation-item">
+                  <div className="transformation-media">
+                    {t.mediaType === 'video' ? (
+                      <TrimmedVideo src={t.media} trimStart={t.trimStart} trimEnd={t.trimEnd} muted autoPlay playsInline />
+                    ) : (
+                      <img src={t.media} alt={t.name || 'Client transformation'} />
+                    )}
                   </div>
+                  {(t.name || t.caption) && (
+                    <div className="transformation-meta">
+                      {t.name && <span className="transformation-name">{t.name}</span>}
+                      {t.caption && <p className="transformation-caption">{t.caption}</p>}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

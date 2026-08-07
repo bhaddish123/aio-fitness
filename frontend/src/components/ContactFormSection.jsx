@@ -52,7 +52,7 @@ export default function ContactFormSection() {
           <p className="contact-form-role">Fitness Coach</p>
 
           <div className="contact-form-details">
-            <span>Devon, PA</span>
+            <span>Fort Washington, PA</span>
             <a href="tel:+12159701446">Tel: (215) 970-1446</a>
             <a href="mailto:everettleefitness@gmail.com">everettleefitness@gmail.com</a>
           </div>
