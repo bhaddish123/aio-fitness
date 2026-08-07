@@ -119,7 +119,7 @@
   }
 
   .about-hero-image {
-    height: calc(100vw + 64px);
+    height: 100svh;
   }
 
   .about-intro {
