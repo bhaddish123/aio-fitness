@@ -27,15 +27,18 @@ public class AvailabilityService {
     private final BookingRepository bookingRepository;
     private final SessionTypeRepository sessionTypeRepository;
     private final ScheduleOverrideRepository scheduleOverrideRepository;
+    private final CalendarService calendarService;
 
     public AvailabilityService(AvailabilityRuleRepository availabilityRuleRepository,
                                 BookingRepository bookingRepository,
                                 SessionTypeRepository sessionTypeRepository,
-                                ScheduleOverrideRepository scheduleOverrideRepository) {
+                                ScheduleOverrideRepository scheduleOverrideRepository,
+                                CalendarService calendarService) {
         this.availabilityRuleRepository = availabilityRuleRepository;
         this.bookingRepository = bookingRepository;
         this.sessionTypeRepository = sessionTypeRepository;
         this.scheduleOverrideRepository = scheduleOverrideRepository;
+        this.calendarService = calendarService;
     }
 
     public List<Instant> getAvailableSlots(UUID sessionTypeId) {
@@ -117,6 +120,15 @@ public class AvailabilityService {
             if (!overlaps && !blockedSlots.contains(manualSlot) && addedTimes.add(manualSlot)) {
                 available.add(manualSlot);
             }
+        }
+
+        // Filter out slots that overlap with existing events on Everett's Google Calendar
+        List<CalendarService.BusyInterval> gcalBusy = calendarService.getBusyIntervals(windowStart, windowEnd);
+        if (!gcalBusy.isEmpty()) {
+            available.removeIf(slot -> {
+                Instant slotEnd = slot.plusSeconds(durationMinutes * 60L);
+                return gcalBusy.stream().anyMatch(b -> slot.isBefore(b.end()) && slotEnd.isAfter(b.start()));
+            });
         }
 
         available.sort(Instant::compareTo);

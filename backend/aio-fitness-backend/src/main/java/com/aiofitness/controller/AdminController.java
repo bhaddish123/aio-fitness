@@ -9,6 +9,7 @@ import com.aiofitness.repository.AvailabilityRuleRepository;
 import com.aiofitness.repository.BookingRepository;
 import com.aiofitness.repository.ScheduleOverrideRepository;
 import com.aiofitness.service.BookingService;
+import com.aiofitness.service.CalendarService;
 import com.aiofitness.service.EmailService;
 import com.aiofitness.service.LoginAttemptService;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ public class AdminController {
     private final AvailabilityRuleRepository availabilityRuleRepository;
     private final ScheduleOverrideRepository scheduleOverrideRepository;
     private final BookingService bookingService;
+    private final CalendarService calendarService;
     private final EmailService emailService;
     private final JwtUtil jwtUtil;
     private final LoginAttemptService loginAttemptService;
@@ -43,6 +45,7 @@ public class AdminController {
                            AvailabilityRuleRepository availabilityRuleRepository,
                            ScheduleOverrideRepository scheduleOverrideRepository,
                            BookingService bookingService,
+                           CalendarService calendarService,
                            EmailService emailService,
                            JwtUtil jwtUtil,
                            LoginAttemptService loginAttemptService) {
@@ -50,6 +53,7 @@ public class AdminController {
         this.availabilityRuleRepository = availabilityRuleRepository;
         this.scheduleOverrideRepository = scheduleOverrideRepository;
         this.bookingService = bookingService;
+        this.calendarService = calendarService;
         this.emailService = emailService;
         this.jwtUtil = jwtUtil;
         this.loginAttemptService = loginAttemptService;
@@ -60,6 +64,22 @@ public class AdminController {
     public ResponseEntity<String> emailPreview(@RequestParam(defaultValue = "confirmation") String type) {
         String html = emailService.previewHtml(type);
         return ResponseEntity.ok(html);
+    }
+
+    /** GET /admin/dev/freebusy-test — returns what Google Calendar FreeBusy sees for the next 7 days. Remove before final deploy. */
+    @GetMapping("/dev/freebusy-test")
+    public ResponseEntity<?> freeBusyTest() {
+        java.time.Instant from = java.time.Instant.now();
+        java.time.Instant to = from.plus(7, java.time.temporal.ChronoUnit.DAYS);
+        List<CalendarService.BusyInterval> busy = calendarService.getBusyIntervals(from, to);
+        return ResponseEntity.ok(Map.of(
+                "from", from.toString(),
+                "to", to.toString(),
+                "busyCount", busy.size(),
+                "intervals", busy.stream()
+                        .map(b -> Map.of("start", b.start().toString(), "end", b.end().toString()))
+                        .toList()
+        ));
     }
 
     /* ── Auth ──────────────────────────────────────────────────── */
@@ -209,6 +229,21 @@ public class AdminController {
             result.add(new DaySlotDto(
                     slotTime.toString(), status, overrideId, bookingId,
                     clientName, notes, ruleSlots.contains(slotTime)));
+        }
+
+        // Mark AVAILABLE slots as BLOCKED if they overlap with existing Google Calendar events
+        List<CalendarService.BusyInterval> gcalBusy = calendarService.getBusyIntervals(dayStart, dayEnd);
+        if (!gcalBusy.isEmpty()) {
+            result = result.stream().map(slot -> {
+                if (!"AVAILABLE".equals(slot.getStatus())) return slot;
+                Instant slotInstant = Instant.parse(slot.getSlotTime());
+                Instant slotEnd = slotInstant.plusSeconds(30 * 60);
+                boolean busy = gcalBusy.stream().anyMatch(b ->
+                        slotInstant.isBefore(b.end()) && slotEnd.isAfter(b.start()));
+                return busy
+                        ? new DaySlotDto(slot.getSlotTime(), "BLOCKED", null, null, null, "Google Calendar", slot.isRuleGenerated())
+                        : slot;
+            }).toList();
         }
 
         return ResponseEntity.ok(result);

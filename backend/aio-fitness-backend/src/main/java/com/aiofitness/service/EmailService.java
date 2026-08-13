@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -60,7 +61,7 @@ public class EmailService {
                   <a href="%s/cancel/%s" style="display:inline-block;padding:12px 28px;background:transparent;color:#D4AF37;border:1px solid #D4AF37;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600">Cancel Booking</a>
                 </p>
                 """.formatted(
-                booking.getClientName(),
+                esc(booking.getClientName()),
                 booking.getSessionType().getName(),
                 time,
                 LOCATION,
@@ -78,7 +79,7 @@ public class EmailService {
                   <a href="%s" style="display:inline-block;padding:12px 28px;background:#D4AF37;color:#0a0a09;border-radius:6px;text-decoration:none;font-size:14px;font-weight:700">Book Another Session</a>
                 </p>
                 """.formatted(
-                booking.getClientName(),
+                esc(booking.getClientName()),
                 formatTime(booking),
                 SITE_URL
         );
@@ -94,7 +95,7 @@ public class EmailService {
                   <a href="%s" style="display:inline-block;padding:12px 28px;background:#D4AF37;color:#0a0a09;border-radius:6px;text-decoration:none;font-size:14px;font-weight:700">Try Again</a>
                 </p>
                 """.formatted(
-                booking.getClientName(),
+                esc(booking.getClientName()),
                 formatTime(booking),
                 SITE_URL
         );
@@ -114,7 +115,7 @@ public class EmailService {
                   </table></td></tr>
                 </table>
                 """.formatted(
-                booking.getClientName(),
+                esc(booking.getClientName()),
                 booking.getSessionType().getName(),
                 formatTime(booking),
                 LOCATION
@@ -135,7 +136,7 @@ public class EmailService {
                   </table></td></tr>
                 </table>
                 """.formatted(
-                booking.getClientName(),
+                esc(booking.getClientName()),
                 booking.getSessionType().getName(),
                 formatTime(booking),
                 LOCATION
@@ -152,7 +153,7 @@ public class EmailService {
                   <a href="%s" style="display:inline-block;padding:12px 28px;background:#D4AF37;color:#0a0a09;border-radius:6px;text-decoration:none;font-size:14px;font-weight:700">Book Your Next Session</a>
                 </p>
                 """.formatted(
-                booking.getClientName(),
+                esc(booking.getClientName()),
                 SITE_URL
         );
         send(booking.getClientEmail(), "Thanks for Training With Us — AIO Fitness", body);
@@ -173,12 +174,12 @@ public class EmailService {
                   </table></td></tr>
                 </table>
                 """.formatted(
-                req.packageName(),
-                req.clientName(),
-                req.clientEmail(),
-                req.clientPhone() != null && !req.clientPhone().isBlank() ? req.clientPhone() : "n/a",
-                req.goals(),
-                req.questions() != null && !req.questions().isBlank() ? req.questions() : "n/a"
+                esc(req.packageName()),
+                esc(req.clientName()),
+                esc(req.clientEmail()),
+                req.clientPhone() != null && !req.clientPhone().isBlank() ? esc(req.clientPhone()) : "n/a",
+                esc(req.goals()),
+                req.questions() != null && !req.questions().isBlank() ? esc(req.questions()) : "n/a"
         );
         send(notifyEmail, "New Inquiry: " + req.packageName() + " — " + req.clientName(), toEverett);
 
@@ -189,7 +190,7 @@ public class EmailService {
                 <p style="margin:0 0 24px;text-align:center">
                   <a href="%s" style="display:inline-block;padding:12px 28px;background:#D4AF37;color:#0a0a09;border-radius:6px;text-decoration:none;font-size:14px;font-weight:700">Visit AIO Fitness</a>
                 </p>
-                """.formatted(req.clientName(), req.packageName(), SITE_URL);
+                """.formatted(esc(req.clientName()), esc(req.packageName()), SITE_URL);
         send(req.clientEmail(), "Your Inquiry — AIO Fitness", toClient);
     }
 
@@ -322,5 +323,9 @@ public class EmailService {
     private String formatTime(Booking booking) {
         return ZonedDateTime.ofInstant(booking.getStartTime(), ZoneId.of("America/New_York"))
                 .format(FORMATTER);
+    }
+
+    private static String esc(String s) {
+        return s == null ? "" : HtmlUtils.htmlEscape(s);
     }
 }

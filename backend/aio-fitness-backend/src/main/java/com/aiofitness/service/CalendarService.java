@@ -3,9 +3,13 @@ package com.aiofitness.service;
 import com.aiofitness.model.Booking;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.FreeBusyRequest;
+import com.google.api.services.calendar.model.FreeBusyRequestItem;
+import com.google.api.services.calendar.model.FreeBusyResponse;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 import org.slf4j.Logger;
@@ -17,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
@@ -101,6 +106,40 @@ public class CalendarService {
             log.info("Deleted Google Calendar event {}", eventId);
         } catch (Exception e) {
             log.error("Failed to delete Google Calendar event {}: {}", eventId, e.getMessage(), e);
+        }
+    }
+
+    public record BusyInterval(Instant start, Instant end) {}
+
+    /** Returns busy intervals on Everett's calendar in [from, to). Returns empty list if unconfigured or on any error. */
+    public List<BusyInterval> getBusyIntervals(Instant from, Instant to) {
+        if (!isConfigured()) return List.of();
+        try {
+            FreeBusyRequest req = new FreeBusyRequest()
+                    .setTimeMin(new DateTime(from.toEpochMilli()))
+                    .setTimeMax(new DateTime(to.toEpochMilli()))
+                    .setItems(List.of(new FreeBusyRequestItem().setId(calendarId)));
+            FreeBusyResponse resp = getClient().freebusy().query(req).execute();
+
+            var calData = resp.getCalendars() != null ? resp.getCalendars().get(calendarId) : null;
+            if (calData == null) {
+                log.warn("FreeBusy: no data returned for calendarId '{}' — verify calendar sharing with service account", calendarId);
+                return List.of();
+            }
+            var busy = calData.getBusy();
+            if (busy == null || busy.isEmpty()) {
+                log.info("FreeBusy: 0 busy intervals for {} → {}", from, to);
+                return List.of();
+            }
+            log.info("FreeBusy: {} busy interval(s) found for {} → {}", busy.size(), from, to);
+            return busy.stream()
+                    .map(p -> new BusyInterval(
+                            Instant.ofEpochMilli(p.getStart().getValue()),
+                            Instant.ofEpochMilli(p.getEnd().getValue())))
+                    .toList();
+        } catch (Exception e) {
+            log.warn("FreeBusy API call failed: {}", e.getMessage());
+            return List.of();
         }
     }
 

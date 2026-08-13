@@ -28,3 +28,13 @@
   margin: 0;
 }
 
+.footer-dev-link {
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-dev-link:hover {
+  color: var(--blue);
+}
+
