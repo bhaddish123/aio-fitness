@@ -97,6 +97,27 @@ public class CalendarService {
         }
     }
 
+    /** Creates a block event on Everett's calendar for a manually-blocked admin slot. Returns the event ID or null on failure. */
+    public String createBlockEvent(Instant start, Instant end, String label) {
+        if (!isConfigured()) return null;
+        try {
+            String summary = (label != null && !label.isBlank()) ? "Blocked — " + label : "Blocked";
+            com.google.api.services.calendar.model.Event event = new com.google.api.services.calendar.model.Event()
+                    .setSummary(summary)
+                    .setStart(toEventDateTime(start))
+                    .setEnd(toEventDateTime(end));
+            com.google.api.services.calendar.model.Event created = getClient()
+                    .events()
+                    .insert(calendarId, event)
+                    .execute();
+            log.info("Created block event {} on Google Calendar", created.getId());
+            return created.getId();
+        } catch (Exception e) {
+            log.warn("Failed to create block event on Google Calendar: {}", e.getMessage());
+            return null;
+        }
+    }
+
     /** Removes the calendar event for a cancelled/refunded booking, if one was created. */
     public void deleteEvent(String eventId) {
         if (eventId == null || eventId.isBlank() || !isConfigured()) return;

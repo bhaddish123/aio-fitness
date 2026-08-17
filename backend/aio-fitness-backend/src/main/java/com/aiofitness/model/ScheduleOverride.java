@@ -21,6 +21,9 @@ public class ScheduleOverride {
 
     private String notes;
 
+    @Column(name = "google_calendar_event_id")
+    private String googleCalendarEventId;
+
     public UUID getId()             { return id; }
     public Instant getSlotTime()    { return slotTime; }
     public void setSlotTime(Instant v) { this.slotTime = v; }
@@ -28,4 +31,6 @@ public class ScheduleOverride {
     public void setBlocked(Boolean v)  { this.blocked = v; }
     public String getNotes()        { return notes; }
     public void setNotes(String v)  { this.notes = v; }
+    public String getGoogleCalendarEventId()          { return googleCalendarEventId; }
+    public void setGoogleCalendarEventId(String v)    { this.googleCalendarEventId = v; }
 }

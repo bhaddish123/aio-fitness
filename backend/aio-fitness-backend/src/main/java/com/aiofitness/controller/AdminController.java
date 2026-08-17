@@ -270,7 +270,18 @@ public class AdminController {
         override.setBlocked(request.getBlocked() != null ? request.getBlocked() : false);
         override.setNotes(request.getNotes());
 
-        return ResponseEntity.ok(scheduleOverrideRepository.save(override));
+        scheduleOverrideRepository.save(override);
+
+        if (Boolean.TRUE.equals(override.getBlocked())) {
+            Instant slotEnd = slotTime.plusSeconds(30 * 60);
+            String gcalId = calendarService.createBlockEvent(slotTime, slotEnd, override.getNotes());
+            if (gcalId != null) {
+                override.setGoogleCalendarEventId(gcalId);
+                scheduleOverrideRepository.save(override);
+            }
+        }
+
+        return ResponseEntity.ok(override);
     }
 
     /**
@@ -288,6 +299,11 @@ public class AdminController {
      */
     @DeleteMapping("/schedule/overrides/{id}")
     public ResponseEntity<Void> deleteOverride(@PathVariable UUID id) {
+        scheduleOverrideRepository.findById(id).ifPresent(o -> {
+            if (o.getGoogleCalendarEventId() != null) {
+                calendarService.deleteEvent(o.getGoogleCalendarEventId());
+            }
+        });
         scheduleOverrideRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
