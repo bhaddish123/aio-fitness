@@ -15,7 +15,7 @@
   width: calc(100% + 64px);
   margin-left: -32px;
   margin-right: -32px;
-  margin-top: -80px;
+  margin-top: 8px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: minmax(720px, auto);
