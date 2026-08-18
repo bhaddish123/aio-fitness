@@ -270,6 +270,12 @@ public class AdminController {
         override.setBlocked(request.getBlocked() != null ? request.getBlocked() : false);
         override.setNotes(request.getNotes());
 
+        // If switching from blocked → unblocked, delete the existing GCal block event first
+        if (Boolean.FALSE.equals(override.getBlocked()) && override.getGoogleCalendarEventId() != null) {
+            calendarService.deleteEvent(override.getGoogleCalendarEventId());
+            override.setGoogleCalendarEventId(null);
+        }
+
         scheduleOverrideRepository.save(override);
 
         if (Boolean.TRUE.equals(override.getBlocked())) {

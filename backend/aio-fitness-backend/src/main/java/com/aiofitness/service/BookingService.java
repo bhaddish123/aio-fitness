@@ -242,6 +242,12 @@ public class BookingService {
         booking.setStatus(BookingStatus.REFUNDED);
         bookingRepository.save(booking);
         calendarService.deleteEvent(booking.getGoogleCalendarEventId());
+
+        try {
+            emailService.sendCancellation(booking);
+        } catch (Exception e) {
+            log.error("Failed to send cancellation email for booking {}: {}", booking.getId(), e.getMessage());
+        }
     }
 
     public void cancelByToken(String token) throws Exception {
