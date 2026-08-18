@@ -2,7 +2,12 @@ import { Link } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { useInView } from '../hooks/useInView';
 import { API_BASE_URL } from '../utils/constants';
-import TrimmedVideo from '../utils/TrimmedVideo';
+import iconBody      from '../assets/icons/icon-body.png';
+import iconMindset   from '../assets/icons/icon-mindset.png';
+import iconLifestyle from '../assets/icons/icon-lifestyle.png';
+import iconHealth    from '../assets/icons/icon-health.png';
+import iconCoaching  from '../assets/icons/icon-coaching.png';
+import iconNutrition from '../assets/icons/icon-nutrition.png';
 
 const PHOTO_CACHE_KEY      = 'aio_fitness_hero_photo';
 const VIDEO_CACHE_KEY      = 'aio_fitness_hero_video';
@@ -15,66 +20,12 @@ const DEFAULT_FAQ_PREVIEW = [
 ];
 
 const BUILD_CARDS = [
-  {
-    title: 'Body Transformation',
-    desc:  'Build muscle, lose fat, become stronger, move with less pain, and improve performance.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6.5 6.5h11M4 10h16M7 14h10M9 18h6"/>
-        <path d="M3 8h2m14 0h2M3 12h2m14 0h2"/>
-      </svg>
-    ),
-  },
-  {
-    title: 'Mindset & Confidence',
-    desc:  'Develop confidence, resilience, discipline, and a healthier relationship with exercise.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v0A2.5 2.5 0 0 1 14.5 2H17a2 2 0 0 1 2 2v1a7 7 0 0 1-7 7 7 7 0 0 1-7-7V4a2 2 0 0 1 2-2z"/>
-        <path d="M12 11v4M8 17h8M10 21h4"/>
-      </svg>
-    ),
-  },
-  {
-    title: 'Lifestyle & Habits',
-    desc:  'Create routines that fit your life and make consistency feel achievable.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-        <path d="M8 14l2 2 4-4"/>
-      </svg>
-    ),
-  },
-  {
-    title: 'Health & Longevity',
-    desc:  'Increase energy, build resilience, reduce injury risk, and support your long-term health.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-        <polyline points="2 12 6 12 8 6 10 18 12 12 14 15 16 12 22 12"/>
-      </svg>
-    ),
-  },
-  {
-    title: 'Coaching & Accountability',
-    desc:  'Stay focused, supported, and accountable through every stage of your journey.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-    ),
-  },
-  {
-    title: 'Nutrition & Recovery',
-    desc:  'Build sustainable nutrition and recovery habits that support your goals without taking over your life.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 11l19-9-9 19-2-8-8-2z"/>
-        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/>
-      </svg>
-    ),
-  },
+  { title: 'Body Transformation',      desc: 'Build muscle, lose fat, become stronger, move with less pain, and improve performance.',                               icon: <img src={iconBody}      alt="" /> },
+  { title: 'Mindset & Confidence',     desc: 'Develop confidence, resilience, discipline, and a healthier relationship with exercise.',                             icon: <img src={iconMindset}   alt="" /> },
+  { title: 'Lifestyle & Habits',       desc: 'Create routines that fit your life and make consistency feel achievable.',                                            icon: <img src={iconLifestyle} alt="" /> },
+  { title: 'Health & Longevity',       desc: 'Increase energy, build resilience, reduce injury risk, and support your long-term health.',                          icon: <img src={iconHealth}    alt="" /> },
+  { title: 'Coaching & Accountability',desc: 'Stay focused, supported, and accountable through every stage of your journey.',                                       icon: <img src={iconCoaching}  alt="" /> },
+  { title: 'Nutrition & Recovery',     desc: 'Build sustainable nutrition and recovery habits that support your goals without taking over your life.',               icon: <img src={iconNutrition} alt="" /> },
 ];
 
 const COACHING_STEPS = [
@@ -125,7 +76,6 @@ export default function Home() {
   const [heroVideo, setHeroVideo]           = useState(() => localStorage.getItem(VIDEO_CACHE_KEY)       || '');
   const [heroVideoError, setHeroVideoError] = useState(false);
   const [focusPhoto, setFocusPhoto]         = useState(() => localStorage.getItem(FOCUS_PHOTO_CACHE_KEY) || '');
-  const [transformations, setTransformations] = useState([]);
   const [faqPreview, setFaqPreview]         = useState(DEFAULT_FAQ_PREVIEW);
   const [scrolledPastHero, setScrolledPastHero] = useState(false);
 
@@ -186,12 +136,6 @@ export default function Home() {
         if (data['home.focusPhoto']) {
           setFocusPhoto(data['home.focusPhoto']);
           localStorage.setItem(FOCUS_PHOTO_CACHE_KEY, data['home.focusPhoto']);
-        }
-        if (data['home.transformations']) {
-          try {
-            const parsed = JSON.parse(data['home.transformations']);
-            if (parsed.length) setTransformations(parsed);
-          } catch {}
         }
         if (data.faqs) {
           try {
@@ -343,91 +287,7 @@ export default function Home() {
         </div>
       </AnimatedSection>
 
-      {/* ── Section 5: Coaching Services ──────────────────────── */}
-      <AnimatedSection className="services-preview">
-        <div className="section-inner">
-          <h2 className="section-heading">Coaching Services</h2>
-          <div className="services-grid">
-
-            <div className="service-card">
-              <h3>Programming Plus</h3>
-              <div className="service-price">
-                <span className="service-price-amount">$250</span>
-                <span className="service-price-period">/month</span>
-              </div>
-              <ul className="service-features">
-                <li>Personalized training program</li>
-                <li>Trainerize app</li>
-                <li>Exercise library</li>
-                <li>Regular program updates</li>
-                <li>Clear direction to train independently</li>
-              </ul>
-              <Link to="/coaching/apply?package=programming-plus" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
-                <button className="cta-button-outline svc-btn">Get Started</button>
-              </Link>
-            </div>
-
-            <div className="service-card featured">
-              <span className="service-badge">Most Popular</span>
-              <h3>All-In-One Coaching</h3>
-              <div className="service-price">
-                <span className="service-price-amount">$500</span>
-                <span className="service-price-period">/month</span>
-              </div>
-              <ul className="service-features">
-                <li>Customized programming</li>
-                <li>Program updates</li>
-                <li>Two coaching calls/month</li>
-                <li>Accountability</li>
-                <li>Nutrition guidance</li>
-                <li>Messaging</li>
-                <li>Form review</li>
-                <li>Community</li>
-                <li>Complimentary virtual workout</li>
-              </ul>
-              <Link to="/booking" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-                <button className="cta-button svc-btn">Apply Now</button>
-              </Link>
-            </div>
-
-          </div>
-        </div>
-      </AnimatedSection>
-
-      {/* ── Section 6: Client Transformations ─────────────────── */}
-      <AnimatedSection className="client-transformations">
-        <div className="section-inner">
-          <h2 className="section-heading">Client Results</h2>
-          {transformations.length > 0 ? (
-            <div className="transformation-gallery">
-              {transformations.map((t) => (
-                <div key={t.id} className="transformation-item">
-                  <div className="transformation-media">
-                    {t.mediaType === 'video' ? (
-                      <TrimmedVideo src={t.media} trimStart={t.trimStart} trimEnd={t.trimEnd} muted autoPlay playsInline />
-                    ) : (
-                      <img src={t.media} alt={t.name || 'Client transformation'} />
-                    )}
-                  </div>
-                  {(t.name || t.caption) && (
-                    <div className="transformation-meta">
-                      {t.name && <span className="transformation-name">{t.name}</span>}
-                      {t.caption && <p className="transformation-caption">{t.caption}</p>}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="transformations-placeholder">
-              <p className="transformations-placeholder-label">Before &amp; afters · Milestone wins · Client stories</p>
-              <p className="transformations-placeholder-sub">Real results coming soon.</p>
-            </div>
-          )}
-        </div>
-      </AnimatedSection>
-
-      {/* ── Section 7: Meet Everett ────────────────────────────── */}
+      {/* ── Section 5: Meet Everett ────────────────────────────── */}
       <AnimatedSection className="focus-panel">
         <div className="focus-panel-image">
           <div className="focus-panel-media" ref={focusMediaRef}>

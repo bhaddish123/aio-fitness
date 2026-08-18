@@ -903,13 +903,20 @@
   background: var(--blue-light);
   border: 1px solid rgba(212, 175, 55, 0.35);
   color: var(--blue);
-  margin-bottom: 18px;
+  margin: 0 auto 18px;
 }
 
 .build-icon svg {
   width: 24px;
   height: 24px;
 }
+
+.build-icon img {
+  width: 125%;
+  height: 150%;
+  object-fit: contain;
+}
+
 
 .build-card h3 {
   font-size: 15px;
