@@ -328,8 +328,19 @@ export default function Home() {
       <AnimatedSection className="edu-experience">
         <div className="section-inner">
           <h2 className="section-heading">Education &amp; Experience</h2>
+
+          {/* Hero stat — full width above columns */}
+          <div className="edu-stat-hero">
+            <span className="edu-stat-number">5,000+</span>
+            <div className="edu-stat-text">
+              <span className="edu-stat-label">Professional Coaching Sessions Delivered</span>
+              <span className="edu-stat-sub">Across In-Person &amp; Online Coaching</span>
+            </div>
+          </div>
+
           <div className="edu-columns">
 
+            {/* Column 1 — Education */}
             <div className="edu-col">
               <h3 className="edu-col-heading">Education</h3>
               <div className="edu-degree-grid">
@@ -346,30 +357,33 @@ export default function Home() {
               </p>
             </div>
 
+            {/* Column 2 — Certifications */}
             <div className="edu-col">
               <h3 className="edu-col-heading">Certifications</h3>
-              <div className="edu-cert-grid">
+              <ul className="edu-cert-list">
                 {CERTIFICATIONS.map((c) => (
-                  <div className="edu-cert-card" key={c}>{c}</div>
+                  <li className="edu-cert-item" key={c}>
+                    <span className="edu-cert-check" aria-hidden="true">✓</span>
+                    {c}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
 
+            {/* Column 3 — Coaching Experience */}
             <div className="edu-col">
               <h3 className="edu-col-heading">Coaching Experience</h3>
-              <div className="edu-stat-card">
-                <span className="edu-stat-number">5,000+</span>
-                <span className="edu-stat-label">Professional Coaching Sessions Delivered</span>
-                <span className="edu-stat-sub">Across In-Person &amp; Online Coaching</span>
-              </div>
-              <div className="edu-exp-grid">
+              <ol className="edu-timeline">
                 {EXPERIENCE_ITEMS.map((e) => (
-                  <div className="edu-exp-card" key={e.label}>
-                    <span className="edu-label">{e.label}</span>
-                    {e.sub && <span className="edu-sub">{e.sub}</span>}
-                  </div>
+                  <li className="edu-timeline-item" key={e.label}>
+                    <span className="edu-timeline-dot" aria-hidden="true" />
+                    <div className="edu-timeline-body">
+                      <span className="edu-timeline-role">{e.label}</span>
+                      {e.sub && <span className="edu-timeline-org">{e.sub}</span>}
+                    </div>
+                  </li>
                 ))}
-              </div>
+              </ol>
             </div>
 
           </div>
