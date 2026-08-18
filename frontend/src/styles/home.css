@@ -1395,7 +1395,7 @@
   align-items: center;
   justify-content: center;
   gap: 32px;
-  background: linear-gradient(135deg, rgba(212,175,55,0.14) 0%, rgba(212,175,55,0.04) 100%);
+  background: linear-gradient(135deg, rgba(212,175,55,0.14) 0%, rgba(212,175,55,0.04) 0%);
   border: 2px solid var(--blue);
   border-radius: 20px;
   padding: 40px 48px;

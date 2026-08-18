@@ -122,9 +122,11 @@ export default function ManageSchedule() {
     const fetches = filterTypeId
       ? [scheduleService.getAvailableSlots(filterTypeId)]
       : sessionTypes.map((st) => scheduleService.getAvailableSlots(st.id));
-    Promise.all(fetches)
-      .then((res) => setAvailableSlots([...new Set(res.flat())]))
-      .catch(() => {});
+    Promise.allSettled(fetches)
+      .then((results) => {
+        const slots = results.flatMap((r) => r.status === 'fulfilled' ? r.value : []);
+        setAvailableSlots([...new Set(slots)]);
+      });
   }, [filterTypeId, sessionTypes]);
 
   const refreshBlockedOverrides = useCallback(() => {
@@ -565,6 +567,10 @@ export default function ManageSchedule() {
         )}
       </div>
 
+      <p style={{ fontSize: 13, color: 'var(--gray-400)', margin: '0 0 20px' }}>
+        Set your recurring schedule in <strong style={{ color: 'var(--gray-600)' }}>Default Weekly Hours</strong> above, then click any day on the calendar to block or add individual slots.
+      </p>
+
       {/* Session Type Filter */}
       <div className="schedule-filters">
         <label htmlFor="filterType">Session type:</label>
@@ -581,6 +587,7 @@ export default function ManageSchedule() {
         <span className="status-filters-label">Show:</span>
         {[
           { key: BOOKING_STATUS.CONFIRMED, label: 'Confirmed'            },
+          { key: BOOKING_STATUS.RESERVED,  label: 'Reserved'             },
           { key: 'available',              label: 'Available'             },
           { key: 'blocked',               label: 'Blocked'               },
           { key: BOOKING_STATUS.CANCELLED, label: 'Cancelled / Refunded'  },
@@ -681,9 +688,9 @@ export default function ManageSchedule() {
                             className="day-slot-checkbox"
                           />
                           {isNotSet ? (
-                            <div className="day-slot-info">
+                            <div className="day-slot-info" title="Check to add this slot" style={{ cursor: 'default', opacity: 0.5 }}>
                               <span className="day-slot-time">{fmtCandidateTime(slot.localTime)}</span>
-                              <span className={`status-badge ${sc}`}>—</span>
+                              <span className={`status-badge ${sc}`}>not set</span>
                             </div>
                           ) : (
                             <button
