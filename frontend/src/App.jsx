@@ -19,6 +19,7 @@ import Cancel from './pages/Cancel';
 import BookingSuccess from './pages/BookingSuccess';
 import OnlineCoaching from './pages/OnlineCoaching';
 import CoachingApply from './pages/CoachingApply';
+import Results from './pages/Results';
 
 // Admin pages
 import Dashboard from './pages/Admin/Dashboard';
@@ -42,6 +43,7 @@ function AppContent() {
         <Route path="/booking" element={<Booking />} />
         <Route path="/coaching" element={<OnlineCoaching />} />
         <Route path="/coaching/apply" element={<CoachingApply />} />
+        <Route path="/results" element={<Results />} />
         <Route path="/login" element={<Login />} />
         <Route path="/cancel/:token" element={<Cancel />} />
         <Route path="/success" element={<BookingSuccess />} />

@@ -1012,6 +1012,103 @@
   .step-label  { max-width: none; }
 }
 
+/* ── Plan cards (below How Coaching Works steps) ────────────── */
+.plan-split-label {
+  text-align: center;
+  margin-top: 60px;
+  margin-bottom: 32px;
+}
+
+.plan-split-eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--blue);
+  margin-bottom: 12px;
+}
+
+.plan-split-tagline {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.plan-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.plan-card {
+  background: var(--gradient-section);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.plan-card--featured {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue), 0 12px 40px rgba(212, 175, 55, 0.22);
+}
+
+.plan-card-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--blue);
+}
+
+.plan-card-name {
+  font-size: clamp(22px, 2.5vw, 28px);
+  font-weight: 900;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.plan-card-divider {
+  height: 2px;
+  width: 48px;
+  background: var(--blue);
+  border-radius: 2px;
+}
+
+.plan-card-desc {
+  font-size: 14px;
+  color: var(--gray-600);
+  line-height: 1.65;
+  margin: 0;
+  flex: 1;
+}
+
+.plan-card-price {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--gray-900);
+  font-family: var(--font-display);
+}
+
+.plan-card-price span {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gray-500);
+  margin-left: 2px;
+}
+
+@media (max-width: 600px) {
+  .plan-cards { grid-template-columns: 1fr; }
+}
+
 /* ── Section 5: Coaching Services ───────────────────────────── */
 .services-preview {
   background: var(--navy-mid);
@@ -1237,26 +1334,118 @@
   border-top: 1px solid var(--gray-200);
 }
 
-.edu-grid {
+.edu-columns {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 48px;
+  align-items: start;
 }
 
-.edu-item {
-  background: var(--gradient-section);
-  border: 1px solid var(--gray-200);
-  border-left: 3px solid var(--blue);
-  border-radius: var(--radius);
-  padding: 22px 24px;
-  box-shadow: var(--shadow-sm);
+.edu-col-heading {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin: 0 0 8px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--blue);
+}
+
+.edu-degree-grid {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.edu-degree-card {
+  background: var(--gradient-section);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.edu-item:hover {
+.edu-degree-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(212, 175, 55, 0.18);
+}
+
+.edu-cert-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.edu-cert-card {
+  background: var(--gradient-section);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-900);
+  line-height: 1.4;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.edu-cert-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(212, 175, 55, 0.18);
+}
+
+.edu-stat-card {
+  background: var(--gradient-section);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.edu-stat-number {
+  font-size: clamp(40px, 5vw, 56px);
+  font-weight: 900;
+  color: var(--blue);
+  line-height: 1;
+  font-family: var(--font-display);
+}
+
+.edu-stat-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-900);
+  line-height: 1.35;
+}
+
+.edu-stat-sub {
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+.edu-exp-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.edu-exp-card {
+  background: var(--gradient-section);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.edu-exp-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 28px rgba(212, 175, 55, 0.18);
 }
@@ -1282,11 +1471,28 @@
   color: var(--gray-500);
 }
 
+.edu-focus-note {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin: 0;
+}
+
+.edu-focus-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--blue);
+  margin-right: 6px;
+}
+
 @media (max-width: 860px) {
-  .edu-grid { grid-template-columns: repeat(2, 1fr); }
+  .edu-columns { grid-template-columns: 1fr; gap: 40px; }
+  .edu-cert-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 520px) {
-  .edu-grid { grid-template-columns: 1fr; }
+  .edu-cert-grid { grid-template-columns: 1fr; }
 }
 
 /* ── Section 10: Final CTA ───────────────────────────────────── */
@@ -1303,6 +1509,49 @@
   margin: 0 auto 2.5rem;
   max-width: 680px;
   line-height: 1.2;
+}
+
+/* ── Client Results standalone page ─────────────────────────── */
+.results-page {
+  padding-top: 80px;
+  min-height: 60vh;
+}
+
+.results-hero {
+  background: var(--navy);
+  text-align: center;
+  padding: 80px 32px 64px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.results-hero h1 {
+  font-size: clamp(32px, 5vw, 56px);
+  color: var(--gray-900);
+  margin: 0 0 16px;
+}
+
+.results-sub {
+  font-size: 17px;
+  color: var(--gray-600);
+  margin: 0;
+}
+
+.results-page .section-inner {
+  padding: 72px 32px 96px;
+}
+
+/* ── CoachingApply consult row ───────────────────────────────── */
+.apply-consult-row {
+  text-align: center;
+  margin-top: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.apply-consult-row p {
+  font-size: 14px;
+  color: var(--gray-500);
+  margin: 0 0 12px;
 }
 
 .transformation-video-error {

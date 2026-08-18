@@ -49,10 +49,10 @@ export default function ContactFormSection() {
 
         <div className="contact-form-intro">
           <h2 className="contact-form-name">Everett Lee</h2>
-          <p className="contact-form-role">Fitness Coach</p>
+          <p className="contact-form-role">Fitness, Nutrition, and Life Coach</p>
 
           <div className="contact-form-details">
-            <span>Fort Washington, PA</span>
+            <span>Based in PA, Online offered worldwide</span>
             <a href="tel:+12159701446">Tel: (215) 970-1446</a>
             <a href="mailto:everettleefitness@gmail.com">everettleefitness@gmail.com</a>
           </div>

@@ -4,21 +4,21 @@ import { API_BASE_URL } from '../utils/constants';
 
 const PACKAGES = [
   {
-    id: 'monthly',
-    label: 'Monthly Online Coaching',
-    price: '$300/month*',
-    note: '* Pricing being finalized — Everett will confirm your rate when he follows up.',
+    id: 'programming-plus',
+    label: 'Programming Plus',
+    price: '$250/month',
+    note: null,
   },
   {
-    id: 'program',
-    label: 'One-Time Customized Program',
-    price: '$150',
+    id: 'aio-coaching',
+    label: 'All-In-One Coaching',
+    price: '$500/month',
     note: null,
   },
 ];
 
 const initialForm = {
-  packageId: 'monthly',
+  packageId: 'programming-plus',
   clientName: '',
   clientEmail: '',
   clientPhone: '',
@@ -217,6 +217,13 @@ export default function CoachingApply() {
           <button type="submit" className="cta-button" disabled={submitting}>
             {submitting ? 'Sending…' : 'Submit Inquiry'}
           </button>
+        </div>
+
+        <div className="apply-consult-row">
+          <p>Not sure which plan fits you?</p>
+          <Link to="/booking" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+            <button type="button" className="cta-button-outline">Book a Free Consultation</button>
+          </Link>
         </div>
 
       </form>

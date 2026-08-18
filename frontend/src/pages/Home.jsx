@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { useInView } from '../hooks/useInView';
 import { API_BASE_URL } from '../utils/constants';
+import TrimmedVideo from '../utils/TrimmedVideo';
 
 const PHOTO_CACHE_KEY      = 'aio_fitness_hero_photo';
 const VIDEO_CACHE_KEY      = 'aio_fitness_hero_video';
@@ -16,10 +17,11 @@ const DEFAULT_FAQ_PREVIEW = [
 const BUILD_CARDS = [
   {
     title: 'Body Transformation',
-    desc:  'Build muscle, lose fat, become stronger, move pain-free and improve performance.',
+    desc:  'Build muscle, lose fat, become stronger, move with less pain, and improve performance.',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6.5 6.5h11M6 10h12M8 14h8M10 18h4"/><rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M6.5 6.5h11M4 10h16M7 14h10M9 18h6"/>
+        <path d="M3 8h2m14 0h2M3 12h2m14 0h2"/>
       </svg>
     ),
   },
@@ -28,35 +30,48 @@ const BUILD_CARDS = [
     desc:  'Develop confidence, resilience, discipline, and a healthier relationship with exercise.',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+        <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v0A2.5 2.5 0 0 1 14.5 2H17a2 2 0 0 1 2 2v1a7 7 0 0 1-7 7 7 7 0 0 1-7-7V4a2 2 0 0 1 2-2z"/>
+        <path d="M12 11v4M8 17h8M10 21h4"/>
       </svg>
     ),
   },
   {
     title: 'Lifestyle & Habits',
-    desc:  'Create routines that fit your life and finally become consistent.',
+    desc:  'Create routines that fit your life and make consistency feel achievable.',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+        <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+        <path d="M8 14l2 2 4-4"/>
       </svg>
     ),
   },
   {
     title: 'Health & Longevity',
-    desc:  'Increase energy, reduce disease risk, prevent injuries, and improve quality of life for years to come.',
+    desc:  'Increase energy, build resilience, reduce injury risk, and support your long-term health.',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        <polyline points="2 12 6 12 8 6 10 18 12 12 14 15 16 12 22 12"/>
       </svg>
     ),
   },
   {
     title: 'Coaching & Accountability',
-    desc:  'Stay hopeful, motivated, supported, and accountable through every stage of your journey.',
+    desc:  'Stay focused, supported, and accountable through every stage of your journey.',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
         <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    ),
+  },
+  {
+    title: 'Nutrition & Recovery',
+    desc:  'Build sustainable nutrition and recovery habits that support your goals without taking over your life.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 11l19-9-9 19-2-8-8-2z"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/>
       </svg>
     ),
   },
@@ -66,20 +81,30 @@ const COACHING_STEPS = [
   'Complimentary Consultation',
   'Assessment & Goal Setting',
   'Personalized Roadmap',
-  'Ongoing Coaching & Accountability',
-  'Long-Term Lifestyle Transformation',
+  'Implement, Adjust & Progress',
+  'Build Results That Last',
 ];
 
-const EDU_ITEMS = [
-  { type: 'Degree',        label: "Master's in Sport & Exercise Psychology",    sub: 'West Chester University' },
-  { type: 'Degree',        label: "Bachelor's in Exercise Science",              sub: null },
-  { type: 'Degree',        label: "Associate's in Exercise Science & Wellness",  sub: null },
-  { type: 'Minor',         label: 'Nutrition',                                   sub: null },
-  { type: 'Minor',         label: 'Athletic Coaching',                           sub: null },
-  { type: 'Certification', label: 'ACSM Certified Personal Trainer',             sub: null },
-  { type: 'Certification', label: 'Pain-Free Performance Specialist',            sub: null },
-  { type: 'Experience',    label: 'Assistant Strength & Conditioning Coach',     sub: 'Philadelphia Union' },
-  { type: 'Experience',    label: 'Personal Trainer & Online Coach',             sub: 'Life Time Inc.' },
+const DEGREES = [
+  { label: "Master's in Sport & Exercise Psychology", sub: 'West Chester University' },
+  { label: "Bachelor's in Exercise Science",          sub: null },
+  { label: "Associate's in Exercise Science & Wellness", sub: null },
+];
+const EDU_FOCUS = 'Nutrition & Athletic Coaching';
+
+const CERTIFICATIONS = [
+  'ACSM Certified Personal Trainer',
+  'Pain-Free Performance Specialist',
+  'Mental Health Aide',
+  'CPR/AED Certified',
+];
+
+const EXPERIENCE_ITEMS = [
+  { label: 'Personal Trainer & Online Coach',         sub: 'Life Time' },
+  { label: 'Assistant Strength & Conditioning Coach', sub: 'Philadelphia Union' },
+  { label: 'Gym Operations & Lead Coach',             sub: '3 Years' },
+  { label: 'Physical Therapy Aide',                   sub: 'Exercise & Administrative Support' },
+  { label: 'Group & Semi-Private Coach',              sub: null },
 ];
 
 function AnimatedSection({ className, children }) {
@@ -94,27 +119,6 @@ function AnimatedSection({ className, children }) {
   );
 }
 
-function TrimmedVideo({ src, trimStart, trimEnd, ...props }) {
-  const ref = useRef(null);
-  const [failed, setFailed] = useState(false);
-  useEffect(() => {
-    const v = ref.current;
-    if (!v) return;
-    const onMeta = () => { v.currentTime = trimStart ?? 0; };
-    const onTime = () => {
-      const end = trimEnd ?? v.duration;
-      if (v.currentTime >= end) v.currentTime = trimStart ?? 0;
-    };
-    v.addEventListener('loadedmetadata', onMeta);
-    v.addEventListener('timeupdate', onTime);
-    return () => {
-      v.removeEventListener('loadedmetadata', onMeta);
-      v.removeEventListener('timeupdate', onTime);
-    };
-  }, [trimStart, trimEnd]);
-  if (failed) return <div className="transformation-video-error">Video unavailable — unsupported format</div>;
-  return <video ref={ref} src={src} onError={() => setFailed(true)} {...props} />;
-}
 
 export default function Home() {
   const [heroPhoto, setHeroPhoto]           = useState(() => localStorage.getItem(PHOTO_CACHE_KEY)       || '');
@@ -274,11 +278,11 @@ export default function Home() {
       {/* ── Section 2: Why All In One? ─────────────────────────── */}
       <AnimatedSection className="why-aio">
         <div className="why-aio-inner">
-          <h2>Why 'All In One?'</h2>
+          <h2>Why 'All-In-One?'</h2>
           <p>Health isn't built by workouts alone.</p>
-          <p>Real transformation happens when fitness, nutrition, mindset, accountability, recovery, and lifestyle all work together. That's why I created All In One Fitness.</p>
-          <p>My coaching isn't about giving you another workout plan. It's about helping you build a lifestyle that allows you to stay healthy, energetic, confident, and active for decades.</p>
-          <p className="why-aio-tagline">Fitness is the vehicle. Transformation is the destination.</p>
+          <p>Real transformation happens when fitness, nutrition, mindset, accountability, recovery, and lifestyle all work together. That's why I created All-In-One Fitness.</p>
+          <p>My coaching isn't about giving you another workout plan. It's about helping you build a lifestyle that keeps you healthy, consistent, strong, and excited to train, all while achieving your dream body and maintaining it for life.</p>
+          <p className="why-aio-tagline">Build the body you want, and keep it for life.</p>
         </div>
       </AnimatedSection>
 
@@ -310,6 +314,32 @@ export default function Home() {
               </div>
             ))}
           </div>
+          <div className="plan-split-label">
+            <span className="plan-split-eyebrow">CHOOSE YOUR LEVEL OF SUPPORT</span>
+            <p className="plan-split-tagline">Your roadmap is personalized. The level of support is up to you.</p>
+          </div>
+          <div className="plan-cards">
+            <div className="plan-card">
+              <span className="plan-card-eyebrow">PERSONALIZED PROGRAMMING</span>
+              <h3 className="plan-card-name">Programming+</h3>
+              <div className="plan-card-divider" />
+              <p className="plan-card-desc">For clients who want a personalized training plan, clear direction, and the structure to train more independently.</p>
+              <div className="plan-card-price">$250<span>/month</span></div>
+              <Link to="/coaching/apply?package=programming-plus" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+                <button className="cta-button-outline">Get Started</button>
+              </Link>
+            </div>
+            <div className="plan-card plan-card--featured">
+              <span className="plan-card-eyebrow">COMPLETE COACHING</span>
+              <h3 className="plan-card-name">All-In-One Coaching</h3>
+              <div className="plan-card-divider" />
+              <p className="plan-card-desc">For clients who want to go further with ongoing coaching across training, nutrition, mindset, recovery, lifestyle, and accountability.</p>
+              <div className="plan-card-price">$500<span>/month</span></div>
+              <Link to="/coaching/apply?package=aio-coaching" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+                <button className="cta-button">Apply Now</button>
+              </Link>
+            </div>
+          </div>
         </div>
       </AnimatedSection>
 
@@ -320,25 +350,26 @@ export default function Home() {
           <div className="services-grid">
 
             <div className="service-card">
-              <h3>Custom Training Program</h3>
+              <h3>Programming Plus</h3>
               <div className="service-price">
-                <span className="service-price-amount">$200</span>
-                <span className="service-price-period">one-time</span>
+                <span className="service-price-amount">$250</span>
+                <span className="service-price-period">/month</span>
               </div>
               <ul className="service-features">
-                <li>Personalized program</li>
+                <li>Personalized training program</li>
                 <li>Trainerize app</li>
                 <li>Exercise library</li>
-                <li>Onboarding</li>
+                <li>Regular program updates</li>
+                <li>Clear direction to train independently</li>
               </ul>
-              <Link to="/about" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
-                <button className="cta-button-outline svc-btn">Learn More</button>
+              <Link to="/coaching/apply?package=programming-plus" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+                <button className="cta-button-outline svc-btn">Get Started</button>
               </Link>
             </div>
 
             <div className="service-card featured">
               <span className="service-badge">Most Popular</span>
-              <h3>All In One Coaching</h3>
+              <h3>All-In-One Coaching</h3>
               <div className="service-price">
                 <span className="service-price-amount">$500</span>
                 <span className="service-price-period">/month</span>
@@ -437,14 +468,50 @@ export default function Home() {
       <AnimatedSection className="edu-experience">
         <div className="section-inner">
           <h2 className="section-heading">Education &amp; Experience</h2>
-          <div className="edu-grid">
-            {EDU_ITEMS.map(({ type, label, sub }) => (
-              <div key={label} className="edu-item">
-                <span className="edu-type">{type}</span>
-                <span className="edu-label">{label}</span>
-                {sub && <span className="edu-sub">{sub}</span>}
+          <div className="edu-columns">
+
+            <div className="edu-col">
+              <h3 className="edu-col-heading">Education</h3>
+              <div className="edu-degree-grid">
+                {DEGREES.map((d) => (
+                  <div className="edu-degree-card" key={d.label}>
+                    <span className="edu-type">DEGREE</span>
+                    <span className="edu-label">{d.label}</span>
+                    {d.sub && <span className="edu-sub">{d.sub}</span>}
+                  </div>
+                ))}
               </div>
-            ))}
+              <p className="edu-focus-note">
+                <span className="edu-focus-label">ADDITIONAL ACADEMIC FOCUS</span> {EDU_FOCUS}
+              </p>
+            </div>
+
+            <div className="edu-col">
+              <h3 className="edu-col-heading">Certifications</h3>
+              <div className="edu-cert-grid">
+                {CERTIFICATIONS.map((c) => (
+                  <div className="edu-cert-card" key={c}>{c}</div>
+                ))}
+              </div>
+            </div>
+
+            <div className="edu-col">
+              <h3 className="edu-col-heading">Coaching Experience</h3>
+              <div className="edu-stat-card">
+                <span className="edu-stat-number">5,000+</span>
+                <span className="edu-stat-label">Professional Coaching Sessions Delivered</span>
+                <span className="edu-stat-sub">Across In-Person &amp; Online Coaching</span>
+              </div>
+              <div className="edu-exp-grid">
+                {EXPERIENCE_ITEMS.map((e) => (
+                  <div className="edu-exp-card" key={e.label}>
+                    <span className="edu-label">{e.label}</span>
+                    {e.sub && <span className="edu-sub">{e.sub}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
       </AnimatedSection>

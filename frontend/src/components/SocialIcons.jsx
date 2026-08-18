@@ -1,6 +1,7 @@
-export const FacebookIcon = () => (
-  <svg width="13" height="18" viewBox="0 0 13 18" fill="currentColor" aria-hidden="true">
-    <path d="M11 1H8.5C6 1 4.3 2.7 4.3 5.3V8H1.5v3h2.8v9H8v-9h2.6l.4-3H8V5.3c0-.6.5-1.1 1.1-1.1H11V1z"/>
+export const TrainerizeIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M6.5 6.5h11M6 10h12M9 13.5h6M11 17h2"/>
+    <rect x="3" y="3" width="18" height="18" rx="3"/>
   </svg>
 );
 
@@ -21,7 +22,7 @@ export const LinkedInIcon = () => (
 );
 
 export const SOCIAL_LINKS = [
-  { key: 'facebook', label: 'Follow on Facebook', href: 'https://www.facebook.com/profile.php?id=100087637025380', Icon: FacebookIcon },
+  { key: 'trainerize', label: 'Train with Everett on Trainerize', href: 'TRAINERIZE_URL_PLACEHOLDER', Icon: TrainerizeIcon },
   { key: 'instagram', label: 'Follow on Instagram', href: 'https://www.instagram.com/everettxlee/?hl=en', Icon: InstagramIcon },
   { key: 'linkedin', label: 'Connect on LinkedIn', href: 'https://www.linkedin.com/in/everett-lee-661a56172/', Icon: LinkedInIcon },
 ];

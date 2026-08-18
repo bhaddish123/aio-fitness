@@ -96,6 +96,11 @@ export default function Navigation() {
               onClick={() => handleNav('/coaching')}
             >Coaching</Link>
             <Link
+              to="/results"
+              aria-current={isActive('/results') ? 'page' : undefined}
+              onClick={() => handleNav('/results')}
+            >Results</Link>
+            <Link
               to="/faq"
               aria-current={isActive('/faq') ? 'page' : undefined}
               onClick={() => handleNav('/faq')}

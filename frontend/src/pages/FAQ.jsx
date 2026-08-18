@@ -46,7 +46,7 @@ const DEFAULT_FAQ_ITEMS = [
   {
     id: '9',
     question: 'Does coaching include nutrition guidance?',
-    answer: 'Yes — All In One Coaching includes nutrition guidance as part of the monthly package. This covers dietary recommendations, eating habits, and adjustments as your goals evolve. The Custom Training Program focuses on programming; nutrition guidance is available as a separate add-on.',
+    answer: 'Yes — All-In-One Coaching includes nutrition guidance as part of the monthly package. This covers dietary recommendations, eating habits, and adjustments as your goals evolve. Programming Plus focuses on training; nutrition guidance is available as a separate add-on.',
   },
   {
     id: '10',
@@ -56,7 +56,7 @@ const DEFAULT_FAQ_ITEMS = [
   {
     id: '11',
     question: 'How do I communicate with my coach between sessions?',
-    answer: 'All In One Coaching clients have direct messaging access to Everett for questions, form checks, and check-ins throughout the month, plus two scheduled coaching calls per month. Custom Training Program clients can reach out via email for onboarding questions.',
+    answer: 'All-In-One Coaching clients have direct messaging access to Everett for questions, form checks, and check-ins throughout the month, plus two scheduled coaching calls per month. Programming Plus clients can reach out via email for onboarding questions.',
   },
 ];
 
