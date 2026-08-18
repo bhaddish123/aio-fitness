@@ -267,8 +267,19 @@ export default function Home() {
               <span className="plan-card-eyebrow">PERSONALIZED PROGRAMMING</span>
               <h3 className="plan-card-name">Programming+</h3>
               <div className="plan-card-divider" />
-              <p className="plan-card-desc">For clients who want a personalized training plan, clear direction, and the structure to train more independently.</p>
               <div className="plan-card-price">$250<span>/month</span></div>
+              <ul className="plan-card-features">
+                <li className="feat-yes">Personalized Workout Program</li>
+                <li className="feat-yes">Personalized Program Adjustments</li>
+                <li className="feat-yes">1 Coaching Call/Month (30 min)</li>
+                <li className="feat-yes">Progress &amp; Habit Tracking</li>
+                <li className="feat-yes">Nutrition Guidelines &amp; Resources</li>
+                <li className="feat-yes">Exercise Library &amp; Form Checks</li>
+                <li className="feat-no">Personalized Nutrition Coaching</li>
+                <li className="feat-no">Lifestyle &amp; Mindset Coaching</li>
+                <li className="feat-no">Accountability Coaching</li>
+                <li className="feat-no">Complimentary Virtual Session</li>
+              </ul>
               <Link to="/coaching/apply?package=programming-plus" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
                 <button className="cta-button-outline">Get Started</button>
               </Link>
@@ -277,8 +288,19 @@ export default function Home() {
               <span className="plan-card-eyebrow">COMPLETE COACHING</span>
               <h3 className="plan-card-name">All-In-One Coaching</h3>
               <div className="plan-card-divider" />
-              <p className="plan-card-desc">For clients who want to go further with ongoing coaching across training, nutrition, mindset, recovery, lifestyle, and accountability.</p>
               <div className="plan-card-price">$500<span>/month</span></div>
+              <ul className="plan-card-features">
+                <li className="feat-yes">Personalized Workout Program</li>
+                <li className="feat-yes">Personalized Program Adjustments</li>
+                <li className="feat-yes">2 Coaching Calls/Month (30 min each)</li>
+                <li className="feat-yes">Progress &amp; Habit Tracking</li>
+                <li className="feat-yes">Nutrition Guidelines &amp; Resources</li>
+                <li className="feat-yes">Exercise Library &amp; Form Checks</li>
+                <li className="feat-yes feat-exclusive">Personalized Nutrition Coaching</li>
+                <li className="feat-yes feat-exclusive">Lifestyle &amp; Mindset Coaching</li>
+                <li className="feat-yes feat-exclusive">Accountability Coaching</li>
+                <li className="feat-yes feat-exclusive">Complimentary 60-Min Virtual Session</li>
+              </ul>
               <Link to="/coaching/apply?package=aio-coaching" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
                 <button className="cta-button">Apply Now</button>
               </Link>

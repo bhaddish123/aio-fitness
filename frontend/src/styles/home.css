@@ -1098,6 +1098,54 @@
   flex: 1;
 }
 
+.plan-card-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+}
+
+.plan-card-features li {
+  font-size: 13px;
+  line-height: 1.4;
+  padding-left: 22px;
+  position: relative;
+}
+
+.feat-yes {
+  color: var(--gray-600);
+}
+
+.feat-yes::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #22c55e;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.feat-no {
+  color: var(--gray-400);
+}
+
+.feat-no::before {
+  content: '✕';
+  position: absolute;
+  left: 0;
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.feat-exclusive {
+  color: var(--gray-900);
+  font-weight: 600;
+}
+
 .plan-card-price {
   font-size: 32px;
   font-weight: 900;
