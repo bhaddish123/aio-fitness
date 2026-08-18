@@ -420,17 +420,24 @@ export default function ManageSchedule() {
     if (!toBlock.length) return;
 
     setModal((prev) => ({ ...prev, isLoading: true, apiError: null }));
-    try {
-      await Promise.all(
-        toBlock.map((localTime) => scheduleService.createOverride({ date: dateKey, localTime, blocked: true }))
-      );
-      showToast(`${toBlock.length} slot${toBlock.length !== 1 ? 's' : ''} blocked.`);
-      refreshAvailableSlots();
-      refreshBlockedOverrides();
-      await fetchDaySlots(dateKey);
+    const results = await Promise.allSettled(
+      toBlock.map((localTime) => scheduleService.createOverride({ date: dateKey, localTime, blocked: true }))
+    );
+    const failed = results.filter((r) => r.status === 'rejected').length;
+    const succeeded = results.length - failed;
+    refreshAvailableSlots();
+    refreshBlockedOverrides();
+    await fetchDaySlots(dateKey);
+    if (failed === 0) {
+      showToast(`${succeeded} slot${succeeded !== 1 ? 's' : ''} blocked.`);
       setModal((prev) => ({ ...prev, isLoading: false, checkedSlots: [] }));
-    } catch {
-      setModal((prev) => ({ ...prev, isLoading: false, apiError: 'Failed to block slots.' }));
+    } else {
+      setModal((prev) => ({
+        ...prev,
+        isLoading: false,
+        checkedSlots: [],
+        apiError: `${succeeded} blocked, ${failed} failed — refresh and try again.`,
+      }));
     }
   };
 
@@ -442,17 +449,24 @@ export default function ManageSchedule() {
     if (!toAdd.length) return;
 
     setModal((prev) => ({ ...prev, isLoading: true, apiError: null }));
-    try {
-      await Promise.all(
-        toAdd.map((localTime) => scheduleService.createOverride({ date: dateKey, localTime, blocked: false }))
-      );
-      showToast(`${toAdd.length} slot${toAdd.length !== 1 ? 's' : ''} added.`);
-      refreshAvailableSlots();
-      refreshBlockedOverrides();
-      await fetchDaySlots(dateKey);
+    const results = await Promise.allSettled(
+      toAdd.map((localTime) => scheduleService.createOverride({ date: dateKey, localTime, blocked: false }))
+    );
+    const failed = results.filter((r) => r.status === 'rejected').length;
+    const succeeded = results.length - failed;
+    refreshAvailableSlots();
+    refreshBlockedOverrides();
+    await fetchDaySlots(dateKey);
+    if (failed === 0) {
+      showToast(`${succeeded} slot${succeeded !== 1 ? 's' : ''} added.`);
       setModal((prev) => ({ ...prev, isLoading: false, checkedSlots: [] }));
-    } catch {
-      setModal((prev) => ({ ...prev, isLoading: false, apiError: 'Failed to add slots.' }));
+    } else {
+      setModal((prev) => ({
+        ...prev,
+        isLoading: false,
+        checkedSlots: [],
+        apiError: `${succeeded} added, ${failed} failed — refresh and try again.`,
+      }));
     }
   };
 

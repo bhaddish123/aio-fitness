@@ -48,7 +48,7 @@ public class AvailabilityService {
         int durationMinutes = sessionType.getDurationMinutes();
 
         List<AvailabilityRule> rules = availabilityRuleRepository.findAll();
-        List<Booking> existingBookings = bookingRepository.findAll();
+        List<Booking> existingBookings = bookingRepository.findByStartTimeAfter(Instant.now().minusSeconds(3600));
 
         // Active bookings as [start, end) intervals for overlap detection
         record BookedInterval(Instant start, Instant end) {}
@@ -113,8 +113,10 @@ public class AvailabilityService {
         }
 
         // Add manual (non-blocked) override slots not already covered by a rule
+        Instant sixHoursFromNow = Instant.now().plusSeconds(6 * 60 * 60);
         for (Instant manualSlot : manualSlots) {
             if (addedTimes.contains(manualSlot)) continue; // already a rule-generated slot
+            if (manualSlot.isBefore(sixHoursFromNow)) continue; // enforce same lead time as rule slots
             boolean overlaps = bookedIntervals.stream()
                     .anyMatch(i -> manualSlot.isBefore(i.end()) && manualSlot.plusSeconds(durationMinutes * 60L).isAfter(i.start()));
             if (!overlaps && !blockedSlots.contains(manualSlot) && addedTimes.add(manualSlot)) {

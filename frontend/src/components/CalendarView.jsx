@@ -266,5 +266,6 @@ export default function CalendarView({
 }
 
 function localDateKey(d) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const [year, month, day] = d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' }).split('-');
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 }

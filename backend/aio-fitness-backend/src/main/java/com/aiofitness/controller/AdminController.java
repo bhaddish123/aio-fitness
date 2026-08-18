@@ -10,17 +10,14 @@ import com.aiofitness.repository.BookingRepository;
 import com.aiofitness.repository.ScheduleOverrideRepository;
 import com.aiofitness.service.BookingService;
 import com.aiofitness.service.CalendarService;
-import com.aiofitness.service.EmailService;
 import com.aiofitness.service.LoginAttemptService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
@@ -31,7 +28,6 @@ public class AdminController {
     private final ScheduleOverrideRepository scheduleOverrideRepository;
     private final BookingService bookingService;
     private final CalendarService calendarService;
-    private final EmailService emailService;
     private final JwtUtil jwtUtil;
     private final LoginAttemptService loginAttemptService;
 
@@ -46,7 +42,6 @@ public class AdminController {
                            ScheduleOverrideRepository scheduleOverrideRepository,
                            BookingService bookingService,
                            CalendarService calendarService,
-                           EmailService emailService,
                            JwtUtil jwtUtil,
                            LoginAttemptService loginAttemptService) {
         this.bookingRepository = bookingRepository;
@@ -54,33 +49,10 @@ public class AdminController {
         this.scheduleOverrideRepository = scheduleOverrideRepository;
         this.bookingService = bookingService;
         this.calendarService = calendarService;
-        this.emailService = emailService;
         this.jwtUtil = jwtUtil;
         this.loginAttemptService = loginAttemptService;
     }
 
-    /** GET /admin/dev/email-preview?type=confirmation — renders email HTML in the browser for design review. Remove before final deploy. */
-    @GetMapping(value = "/dev/email-preview", produces = MediaType.TEXT_HTML_VALUE)
-    public ResponseEntity<String> emailPreview(@RequestParam(defaultValue = "confirmation") String type) {
-        String html = emailService.previewHtml(type);
-        return ResponseEntity.ok(html);
-    }
-
-    /** GET /admin/dev/freebusy-test — returns what Google Calendar FreeBusy sees for the next 7 days. Remove before final deploy. */
-    @GetMapping("/dev/freebusy-test")
-    public ResponseEntity<?> freeBusyTest() {
-        java.time.Instant from = java.time.Instant.now();
-        java.time.Instant to = from.plus(7, java.time.temporal.ChronoUnit.DAYS);
-        List<CalendarService.BusyInterval> busy = calendarService.getBusyIntervals(from, to);
-        return ResponseEntity.ok(Map.of(
-                "from", from.toString(),
-                "to", to.toString(),
-                "busyCount", busy.size(),
-                "intervals", busy.stream()
-                        .map(b -> Map.of("start", b.start().toString(), "end", b.end().toString()))
-                        .toList()
-        ));
-    }
 
     /* ── Auth ──────────────────────────────────────────────────── */
 
@@ -185,9 +157,7 @@ public class AdminController {
         }
 
         // ── Bookings for this day ─────────────────────────────────
-        List<Booking> dayBookings = bookingRepository.findAll().stream()
-                .filter(b -> !b.getStartTime().isBefore(dayStart) && b.getStartTime().isBefore(dayEnd))
-                .collect(Collectors.toList());
+        List<Booking> dayBookings = bookingRepository.findByStartTimeBetween(dayStart, dayEnd);
         Map<Instant, Booking> bookingByTime = new HashMap<>();
         for (Booking b : dayBookings) {
             // Prefer the most recently created booking if there are duplicates
@@ -237,7 +207,7 @@ public class AdminController {
             result = result.stream().map(slot -> {
                 if (!"AVAILABLE".equals(slot.getStatus())) return slot;
                 Instant slotInstant = Instant.parse(slot.getSlotTime());
-                Instant slotEnd = slotInstant.plusSeconds(30 * 60);
+                Instant slotEnd = slotInstant.plusSeconds(60 * 60);
                 boolean busy = gcalBusy.stream().anyMatch(b ->
                         slotInstant.isBefore(b.end()) && slotEnd.isAfter(b.start()));
                 return busy
@@ -323,9 +293,10 @@ public class AdminController {
 
     @PostMapping("/availability-rules")
     public ResponseEntity<?> createAvailabilityRule(@RequestBody AvailabilityRule rule) {
+        if (rule.getIsActive() == null) rule.setIsActive(true);
         if (!rule.getEndTime().isAfter(rule.getStartTime()))
             return ResponseEntity.badRequest().body(Map.of("error", "End time must be after start time."));
-        if (rule.getIsActive() == null || rule.getIsActive()) {
+        if (rule.getIsActive()) {
             AvailabilityRule conflict = findOverlappingRule(null, rule.getDayOfWeek(), rule.getStartTime(), rule.getEndTime());
             if (conflict != null)
                 return ResponseEntity.badRequest().body(Map.of("error",

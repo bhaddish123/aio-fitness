@@ -11,6 +11,8 @@ import java.util.UUID;
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
     Optional<Booking> findByStartTime(Instant startTime);
+    List<Booking> findByStartTimeAfter(Instant after);
+    List<Booking> findByStartTimeBetween(Instant from, Instant to);
     Optional<Booking> findByCancellationToken(String cancellationToken);
     Optional<Booking> findByStripeSessionId(String stripeSessionId);
     List<Booking> findByStatusAndReservedUntilBefore(com.aiofitness.model.BookingStatus status, Instant time);

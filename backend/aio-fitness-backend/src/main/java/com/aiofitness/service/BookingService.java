@@ -8,6 +8,7 @@ import com.aiofitness.model.HelpNeededOption;
 import com.aiofitness.model.SessionType;
 import com.aiofitness.repository.AvailabilityRuleRepository;
 import com.aiofitness.repository.BookingRepository;
+import com.aiofitness.repository.ScheduleOverrideRepository;
 import com.aiofitness.repository.SessionTypeRepository;
 import com.stripe.model.Refund;
 import com.stripe.model.checkout.Session;
@@ -40,22 +41,25 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final SessionTypeRepository sessionTypeRepository;
     private final AvailabilityRuleRepository availabilityRuleRepository;
+    private final ScheduleOverrideRepository scheduleOverrideRepository;
     private final EmailService emailService;
     private final CalendarService calendarService;
 
     public BookingService(BookingRepository bookingRepository,
                           SessionTypeRepository sessionTypeRepository,
                           AvailabilityRuleRepository availabilityRuleRepository,
+                          ScheduleOverrideRepository scheduleOverrideRepository,
                           EmailService emailService,
                           CalendarService calendarService) {
         this.bookingRepository = bookingRepository;
         this.sessionTypeRepository = sessionTypeRepository;
         this.availabilityRuleRepository = availabilityRuleRepository;
+        this.scheduleOverrideRepository = scheduleOverrideRepository;
         this.emailService = emailService;
         this.calendarService = calendarService;
     }
     @Transactional
-    public Booking reserveSlot(ReserveBookingRequest request) {
+    public synchronized Booking reserveSlot(ReserveBookingRequest request) {
         if (!request.isWaiverAccepted()) {
             throw new RuntimeException("You must accept the waiver and policy to book a session");
         }
@@ -86,21 +90,29 @@ public class BookingService {
                 .anyMatch(b -> reqStart.isBefore(b.getEndTime()) && reqEnd.isAfter(b.getStartTime()));
         if (overlaps) throw new RuntimeException("Time slot already booked");
 
-        // Validate that the session fits within an availability rule window
+        // Validate that the session fits within an availability rule window,
+        // OR that it was explicitly added as a manual override slot by the admin.
         ZonedDateTime startZdt = request.getStartTime().atZone(ZoneId.of("America/New_York"));
         LocalTime startLocal = startZdt.toLocalTime();
         LocalTime endLocal = startLocal.plusMinutes(sessionType.getDurationMinutes());
         int dayOfWeek = startZdt.getDayOfWeek().getValue() % 7;
 
-        List<AvailabilityRule> rules = availabilityRuleRepository.findAll();
-        boolean fitsInWindow = rules.stream()
-                .filter(AvailabilityRule::getIsActive)
-                .anyMatch(rule -> rule.getDayOfWeek() == dayOfWeek
-                        && !startLocal.isBefore(rule.getStartTime())
-                        && !endLocal.isAfter(rule.getEndTime()));
+        boolean isManualOverride = scheduleOverrideRepository
+                .findBySlotTime(request.getStartTime())
+                .map(o -> Boolean.FALSE.equals(o.getBlocked()))
+                .orElse(false);
 
-        if (!fitsInWindow) {
-            throw new RuntimeException("Selected time slot does not fit within available hours");
+        if (!isManualOverride) {
+            List<AvailabilityRule> rules = availabilityRuleRepository.findAll();
+            boolean fitsInWindow = rules.stream()
+                    .filter(AvailabilityRule::getIsActive)
+                    .anyMatch(rule -> rule.getDayOfWeek() == dayOfWeek
+                            && !startLocal.isBefore(rule.getStartTime())
+                            && !endLocal.isAfter(rule.getEndTime()));
+
+            if (!fitsInWindow) {
+                throw new RuntimeException("Selected time slot does not fit within available hours");
+            }
         }
 
         Booking booking = new Booking();
@@ -239,7 +251,7 @@ public class BookingService {
             }
         }
 
-        booking.setStatus(BookingStatus.REFUNDED);
+        booking.setStatus(booking.getStripeSessionId() != null ? BookingStatus.REFUNDED : BookingStatus.CANCELLED);
         bookingRepository.save(booking);
         calendarService.deleteEvent(booking.getGoogleCalendarEventId());
 
@@ -262,7 +274,7 @@ public class BookingService {
         }
 
         // Save cancellation first so it always succeeds regardless of Stripe outcome
-        booking.setStatus(BookingStatus.REFUNDED);
+        booking.setStatus(booking.getStripeSessionId() != null ? BookingStatus.REFUNDED : BookingStatus.CANCELLED);
         bookingRepository.save(booking);
         calendarService.deleteEvent(booking.getGoogleCalendarEventId());
 
