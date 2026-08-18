@@ -23,15 +23,21 @@ const TIERS = [
     per: '/month',
     tagline: 'For clients who want to go further with ongoing coaching across training, nutrition, mindset, recovery, lifestyle, and accountability.',
     includes: [
-      'Customized programming',
-      'Program updates',
-      'Two coaching calls/month',
-      'Accountability',
-      'Nutrition guidance',
-      'Messaging',
-      'Form review',
-      'Community',
-      'Complimentary virtual workout',
+      { text: 'Full All-In-One Fitness App Access',                            yes: true },
+      { text: 'Personalized Workout Program',                                  yes: true },
+      { text: 'Personalized Program Adjustments',                              yes: true },
+      { text: '2 Coaching Calls/Month (30 min each)',                          yes: true },
+      { text: 'Progress Tracking',                                             yes: true },
+      { text: 'Habit Tracking',                                                yes: true },
+      { text: 'Private Client Community',                                      yes: true },
+      { text: 'Nutrition Guidelines & Resources',                              yes: true },
+      { text: 'Exercise, Program, Nutrition & Lifestyle Coaching Support',     yes: true },
+      { text: 'Exercise Video Library',                                        yes: true },
+      { text: 'Form Video Checks',                                             yes: true },
+      { text: 'Personalized Nutrition Coaching',                               yes: true, exclusive: true },
+      { text: 'Lifestyle & Mindset Coaching',                                  yes: true, exclusive: true },
+      { text: 'Accountability Coaching',                                       yes: true, exclusive: true },
+      { text: 'Complimentary 60-Min Virtual Session (First Month · $100 Value)', yes: true, exclusive: true },
     ],
     bonus: null,
     cta: 'Apply Now',
@@ -46,11 +52,21 @@ const TIERS = [
     per: '/month',
     tagline: 'For clients who want a personalized training plan, clear direction, and the structure to train more independently.',
     includes: [
-      'Personalized training program',
-      'Trainerize app',
-      'Exercise library',
-      'Regular program updates',
-      'Clear direction to train independently',
+      { text: 'Full All-In-One Fitness App Access',                            yes: true },
+      { text: 'Personalized Workout Program',                                  yes: true },
+      { text: 'Personalized Program Adjustments',                              yes: true },
+      { text: '1 Coaching Call/Month (30 min)',                                yes: true },
+      { text: 'Progress Tracking',                                             yes: true },
+      { text: 'Habit Tracking',                                                yes: true },
+      { text: 'Private Client Community',                                      yes: true },
+      { text: 'Nutrition Guidelines & Resources',                              yes: true },
+      { text: 'Exercise & Program Coaching Support',                           yes: true },
+      { text: 'Exercise Video Library',                                        yes: true },
+      { text: 'Form Video Checks',                                             yes: true },
+      { text: 'Personalized Nutrition Coaching',                               yes: false },
+      { text: 'Lifestyle & Mindset Coaching',                                  yes: false },
+      { text: 'Accountability Coaching',                                       yes: false },
+      { text: 'Complimentary 60-Min Virtual Session (First Month · $100 Value)', yes: false },
     ],
     bonus: null,
     cta: 'Get Started',
@@ -105,9 +121,18 @@ export default function OnlineCoaching() {
               </div>
               <p className="coaching-tier-tagline">{tier.tagline}</p>
               <ul className="coaching-tier-includes">
-                {tier.includes.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
+                {tier.includes.map((item) =>
+                  typeof item === 'string' ? (
+                    <li key={item}>{item}</li>
+                  ) : (
+                    <li
+                      key={item.text}
+                      className={`${item.yes ? 'feat-yes' : 'feat-no'}${item.exclusive ? ' feat-exclusive' : ''}`}
+                    >
+                      {item.text}
+                    </li>
+                  )
+                )}
               </ul>
               {tier.bonus && (
                 <p className="coaching-tier-bonus">

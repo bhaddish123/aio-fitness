@@ -148,17 +148,46 @@
   font-size: 14px;
   color: var(--gray-600);
   line-height: 1.5;
-  padding-left: 20px;
+  padding-left: 22px;
   position: relative;
 }
 
-.coaching-tier-includes li::before {
+/* Virtual PT card — plain gold checks */
+.coaching-tier-includes li:not(.feat-yes):not(.feat-no)::before {
   content: '✓';
   position: absolute;
   left: 0;
   color: var(--blue);
   font-weight: 700;
   font-size: 13px;
+}
+
+/* Checklist rows for Programming+ and All-In-One */
+.coaching-tier-includes li.feat-yes::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #22c55e;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.coaching-tier-includes li.feat-no {
+  color: var(--gray-400);
+}
+
+.coaching-tier-includes li.feat-no::before {
+  content: '✕';
+  position: absolute;
+  left: 0;
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.coaching-tier-includes li.feat-exclusive {
+  color: var(--gray-900);
+  font-weight: 600;
 }
 
 .coaching-tier-bonus {
