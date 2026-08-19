@@ -13,11 +13,6 @@ const PHOTO_CACHE_KEY      = 'aio_fitness_hero_photo';
 const VIDEO_CACHE_KEY      = 'aio_fitness_hero_video';
 const FOCUS_PHOTO_CACHE_KEY = 'aio_fitness_focus_photo';
 
-const DEFAULT_FAQ_PREVIEW = [
-  { id: '1', question: 'How does online coaching work?',       answer: 'You get a personalized programming plan delivered through a digital dashboard, with remote check-ins to track progress and adjust as you go.' },
-  { id: '2', question: 'Do I need a specific gym membership?', answer: "No — programs are built around the equipment you actually have access to, whether that's a full gym, a home setup, or just the basics." },
-  { id: '3', question: 'How do we track progress?',            answer: 'Through app-based tracking and regular check-ins, so your plan keeps adapting to real results, not guesswork.' },
-];
 
 const BUILD_CARDS = [
   { title: 'Body Transformation',      desc: 'Build muscle, lose fat, become stronger, move with less pain, and improve performance.',                               icon: <img src={iconBody}      alt="" /> },
@@ -76,7 +71,6 @@ export default function Home() {
   const [heroVideo, setHeroVideo]           = useState(() => localStorage.getItem(VIDEO_CACHE_KEY)       || '');
   const [heroVideoError, setHeroVideoError] = useState(false);
   const [focusPhoto, setFocusPhoto]         = useState(() => localStorage.getItem(FOCUS_PHOTO_CACHE_KEY) || '');
-  const [faqPreview, setFaqPreview]         = useState(DEFAULT_FAQ_PREVIEW);
   const [scrolledPastHero, setScrolledPastHero] = useState(false);
 
   const heroMediaRef  = useRef(null);
@@ -137,12 +131,7 @@ export default function Home() {
           setFocusPhoto(data['home.focusPhoto']);
           localStorage.setItem(FOCUS_PHOTO_CACHE_KEY, data['home.focusPhoto']);
         }
-        if (data.faqs) {
-          try {
-            const parsed = JSON.parse(data.faqs);
-            if (parsed.length) setFaqPreview(parsed.slice(0, 3));
-          } catch {}
-        }
+
       })
       .catch(() => {});
   }, []);
@@ -412,19 +401,7 @@ export default function Home() {
         </div>
       </AnimatedSection>
 
-      {/* ── Section 9: FAQ preview ─────────────────────────────── */}
-      <AnimatedSection className="faq-preview">
-        <h2 className="heading-pop">Common Questions</h2>
-        {faqPreview.map((item, i) => (
-          <div className="faq-item" key={i}>
-            <strong>{item.question}</strong>
-            <p>{item.answer}</p>
-          </div>
-        ))}
-        <Link to="/faq" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>View All FAQs →</Link>
-      </AnimatedSection>
-
-      {/* ── Section 10: Final CTA ──────────────────────────────── */}
+      {/* ── Section 9: Final CTA ──────────────────────────────── */}
       <AnimatedSection className="home-cta">
         <h2>Ready to Become the Strongest Version of Yourself?</h2>
         <Link to="/booking" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
