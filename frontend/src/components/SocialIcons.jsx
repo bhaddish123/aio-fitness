@@ -22,7 +22,7 @@ export const LinkedInIcon = () => (
 );
 
 export const SOCIAL_LINKS = [
-  { key: 'trainerize', label: 'Train with Everett on Trainerize', href: 'TRAINERIZE_URL_PLACEHOLDER', Icon: TrainerizeIcon },
+  { key: 'trainerize', label: 'Train with Everett on Trainerize', href: 'https://everettleecoaching.trainerize.com/app/login', Icon: TrainerizeIcon },
   { key: 'instagram', label: 'Follow on Instagram', href: 'https://www.instagram.com/everettxlee/?hl=en', Icon: InstagramIcon },
   { key: 'linkedin', label: 'Connect on LinkedIn', href: 'https://www.linkedin.com/in/everett-lee-661a56172/', Icon: LinkedInIcon },
 ];
