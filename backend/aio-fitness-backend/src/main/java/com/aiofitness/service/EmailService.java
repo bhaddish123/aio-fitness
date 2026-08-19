@@ -194,6 +194,27 @@ public class EmailService {
         send(req.clientEmail(), "Your Inquiry — AIO Fitness", toClient);
     }
 
+    public void sendAdminBookingNotification(Booking booking) {
+        String body = """
+                <p style="margin:0 0 16px">A new session has been booked.</p>
+                <table style="width:100%%;border-collapse:collapse;margin-bottom:24px">
+                  <tr><td style="padding:10px 14px;background:#1a1917;border-radius:6px 6px 0 0;color:#D4AF37;font-weight:600;font-size:13px;letter-spacing:.5px;text-transform:uppercase">Booking Details</td></tr>
+                  <tr><td style="padding:0"><table style="width:100%%;border-collapse:collapse">
+                    <tr><td style="padding:10px 14px;background:#111110;font-size:13px;color:rgba(245,243,240,0.6);width:120px">Client</td><td style="padding:10px 14px;background:#111110;font-size:14px;color:#f5f3ee">%s</td></tr>
+                    <tr><td style="padding:10px 14px;background:#0f0f0e;font-size:13px;color:rgba(245,243,240,0.6)">Email</td><td style="padding:10px 14px;background:#0f0f0e;font-size:14px;color:#f5f3ee">%s</td></tr>
+                    <tr><td style="padding:10px 14px;background:#111110;font-size:13px;color:rgba(245,243,240,0.6)">Session</td><td style="padding:10px 14px;background:#111110;font-size:14px;color:#f5f3ee">%s</td></tr>
+                    <tr><td style="padding:10px 14px;background:#0f0f0e;font-size:13px;color:rgba(245,243,240,0.6);border-radius:0 0 0 6px">Date &amp; Time</td><td style="padding:10px 14px;background:#0f0f0e;font-size:14px;color:#f5f3ee;border-radius:0 0 6px 0">%s</td></tr>
+                  </table></td></tr>
+                </table>
+                """.formatted(
+                esc(booking.getClientName()),
+                esc(booking.getClientEmail()),
+                booking.getSessionType().getName(),
+                formatTime(booking)
+        );
+        send(notifyEmail, "New Booking — " + booking.getClientName(), body);
+    }
+
     /* ── Preview (dev only) ───────────────────────────────────── */
 
     public String previewHtml(String type) {

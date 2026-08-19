@@ -152,6 +152,7 @@ public class BookingService {
             saved = bookingRepository.save(saved);
             try {
                 emailService.sendConfirmation(saved);
+                emailService.sendAdminBookingNotification(saved);
             } catch (Exception e) {
                 log.error("Failed to send confirmation email for free booking {}: {}", saved.getId(), e.getMessage(), e);
             }
@@ -205,6 +206,7 @@ public class BookingService {
 
         try {
             emailService.sendConfirmation(booking);
+            emailService.sendAdminBookingNotification(booking);
         } catch (Exception e) {
             log.error("Failed to send confirmation email for booking {}: {}", booking.getId(), e.getMessage(), e);
         }
