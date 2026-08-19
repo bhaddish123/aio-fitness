@@ -83,6 +83,7 @@ export default function CoachingApply() {
       if (text) { try { data = JSON.parse(text); } catch (_) {} }
       if (!res.ok) throw new Error(data.error || 'Submission failed.');
       setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: 'instant' });
     } catch (err) {
       setServerError(err.message || 'Something went wrong. Please try again.');
     } finally {
@@ -100,8 +101,14 @@ export default function CoachingApply() {
             Everett will review your information and reach out to{' '}
             <strong>{form.clientEmail}</strong> shortly to discuss your goals and next steps.
           </p>
-          <Link to="/coaching" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
-            <button className="cta-button">Back to Coaching</button>
+          <p style={{ marginTop: '12px', fontSize: '15px', opacity: 0.8 }}>
+            In the meantime, feel free to book your free consultation to get on the calendar.
+          </p>
+          <Link to="/booking" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+            <button className="cta-button">Book a Free Consultation</button>
+          </Link>
+          <Link to="/coaching" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })} style={{ display: 'block', marginTop: '14px', fontSize: '14px', color: 'var(--gray-400)', textDecoration: 'none' }}>
+            ← Back to Coaching
           </Link>
         </div>
       </main>
@@ -222,7 +229,7 @@ export default function CoachingApply() {
         <div className="apply-consult-row">
           <p>Not sure which plan fits you?</p>
           <Link to="/booking" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
-            <button type="button" className="cta-button-outline">Book a Free Consultation</button>
+            <button type="button" className="cta-button">Book a Free Consultation</button>
           </Link>
         </div>
 

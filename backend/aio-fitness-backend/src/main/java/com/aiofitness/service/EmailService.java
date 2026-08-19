@@ -26,11 +26,11 @@ public class EmailService {
     private String notifyEmail;
 
     private static final String SITE_URL   = "https://everettleecoaching.com";
-    private static final String LOCATION   = "Devon, PA";
+    private static final String LOCATION   = "Based in PA, Online offered worldwide";
     private static final String PHONE      = "(215) 970-1446";
     private static final String EMAIL      = "everettleefitness@gmail.com";
     private static final String LOGO_URL   = "https://i.imgur.com/QiuHwns.png";
-    private static final String FB_URL     = "https://www.facebook.com/profile.php?id=100087637025380";
+    private static final String TRAINERIZE_URL = "https://everettleecoaching.trainerize.com/app/login";
     private static final String IG_URL     = "https://www.instagram.com/everettxlee/";
     private static final String LI_URL     = "https://www.linkedin.com/in/everett-lee-661a56172/";
 
@@ -294,7 +294,7 @@ public class EmailService {
                           </p>
                           <table cellpadding="0" cellspacing="0" style="margin:0 auto">
                             <tr>
-                              <td style="padding:0 4px"><a href="%s" style="display:inline-block;padding:6px 14px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);border-radius:20px;color:#D4AF37;text-decoration:none;font-size:12px;font-weight:600">Facebook</a></td>
+                              <td style="padding:0 4px"><a href="%s" style="display:inline-block;padding:6px 14px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);border-radius:20px;color:#D4AF37;text-decoration:none;font-size:12px;font-weight:600">Trainerize</a></td>
                               <td style="padding:0 4px"><a href="%s" style="display:inline-block;padding:6px 14px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);border-radius:20px;color:#D4AF37;text-decoration:none;font-size:12px;font-weight:600">Instagram</a></td>
                               <td style="padding:0 4px"><a href="%s" style="display:inline-block;padding:6px 14px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);border-radius:20px;color:#D4AF37;text-decoration:none;font-size:12px;font-weight:600">LinkedIn</a></td>
                             </tr>
@@ -315,7 +315,7 @@ public class EmailService {
                 SITE_URL, LOGO_URL,
                 bodyHtml,
                 LOCATION, PHONE, EMAIL, EMAIL,
-                FB_URL, IG_URL, LI_URL,
+                TRAINERIZE_URL, IG_URL, LI_URL,
                 java.time.Year.now().getValue()
         );
     }
