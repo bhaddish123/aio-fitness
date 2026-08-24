@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import logo from '../assets/a1logo-transparent.png';
+import logo from '../assets/A1_logo_transparent.png';
 
 export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
