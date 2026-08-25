@@ -4,7 +4,7 @@ import { ENDPOINTS } from '../utils/constants';
 const bookingService = {
   /**
    * POST /bookings/reserve
-   * Body: { sessionTypeId, clientName, clientEmail, clientPhone, startTime, intakeNotes, waiverAccepted }
+   * Body: { sessionTypeId, clientName, clientEmail, clientPhone, startTime, intakeNotes }
    * Returns the created Booking object
    */
   async reserve(bookingData) {

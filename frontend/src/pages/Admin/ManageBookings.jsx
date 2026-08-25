@@ -187,9 +187,6 @@ export default function ManageBookings() {
               <span className="detail-label">Help Needed</span>
               <span>{formatHelpNeeded(selectedBooking)}</span>
 
-              <span className="detail-label">Waiver</span>
-              <span>{selectedBooking.waiverAccepted ? 'Accepted' : 'Not accepted'}</span>
-
               <span className="detail-label">Notes</span>
               <span>{selectedBooking.intakeNotes || '—'}</span>
             </div>

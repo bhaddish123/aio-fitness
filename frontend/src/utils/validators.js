@@ -40,8 +40,7 @@ export function validateContactInfo(formData) {
 }
 
 /**
- * Validates sub-step 2 of "Your Details" — the fitness intake questionnaire
- * plus the waiver acknowledgement.
+ * Validates sub-step 2 of "Your Details" — the fitness intake questionnaire.
  * Returns { isValid: boolean, errors: { field: message } }
  */
 export function validateIntakeInfo(formData) {
@@ -74,10 +73,6 @@ export function validateIntakeInfo(formData) {
   } else if (formData.helpNeeded.includes('OTHER') && !validateRequired(formData.helpNeededOther)) {
     errors.helpNeededOther = 'Please specify what "Other" refers to';
   }
-  if (!formData.waiverAccepted) {
-    errors.waiverAccepted = 'You must accept the waiver to proceed';
-  }
-
   return {
     isValid: Object.keys(errors).length === 0,
     errors,

@@ -19,8 +19,6 @@ const TIERS = [
     id: 'aio-coaching',
     badge: 'Most Popular',
     name: 'All-In-One Coaching',
-    price: '$500',
-    per: '/month',
     tagline: 'For clients who want to go further with ongoing coaching across training, nutrition, mindset, recovery, lifestyle, and accountability.',
     includes: [
       { text: 'Full All-In-One Fitness App Access',                            yes: true },
@@ -37,7 +35,6 @@ const TIERS = [
       { text: 'Personalized Nutrition Coaching',                               yes: true, exclusive: true },
       { text: 'Lifestyle & Mindset Coaching',                                  yes: true, exclusive: true },
       { text: 'Accountability Coaching',                                       yes: true, exclusive: true },
-      { text: 'Complimentary 60-Min Virtual Session (First Month · $100 Value)', yes: true, exclusive: true },
     ],
     bonus: null,
     cta: 'Apply Now',
@@ -48,8 +45,6 @@ const TIERS = [
     id: 'programming-plus',
     badge: null,
     name: 'Programming Plus',
-    price: '$250',
-    per: '/month',
     tagline: 'For clients who want a personalized training plan, clear direction, and the structure to train more independently.',
     includes: [
       { text: 'Full All-In-One Fitness App Access',                            yes: true },
@@ -66,7 +61,6 @@ const TIERS = [
       { text: 'Personalized Nutrition Coaching',                               yes: false },
       { text: 'Lifestyle & Mindset Coaching',                                  yes: false },
       { text: 'Accountability Coaching',                                       yes: false },
-      { text: 'Complimentary 60-Min Virtual Session (First Month · $100 Value)', yes: false },
     ],
     bonus: null,
     cta: 'Get Started',
@@ -74,21 +68,19 @@ const TIERS = [
     highlight: false,
   },
   {
-    id: 'virtual',
+    id: 'consultation',
     badge: null,
-    name: 'Virtual Personal Training',
-    price: '$100',
-    per: '/hour',
-    tagline: 'Live 1-on-1 coaching via Zoom or FaceTime — train from anywhere.',
+    name: 'Free Consultation',
+    tagline: 'Not sure where to start? Book a complimentary call to talk through your goals and see if coaching is the right fit.',
     includes: [
-      '1-on-1 live coaching',
-      'Real-time exercise corrections and cueing',
-      'Workout guidance and pacing',
-      'Exercise substitutions when needed',
-      'Flexible — home, hotel gym, or commercial gym',
+      { text: '30-Minute Video or Phone Call',      yes: true },
+      { text: 'Goals & Lifestyle Assessment',        yes: true },
+      { text: 'Personalized Recommendations',        yes: true },
+      { text: 'No Payment Required',                 yes: true },
+      { text: 'No Obligation to Continue',            yes: true },
     ],
     bonus: null,
-    cta: 'Book a Virtual Session',
+    cta: 'Book Free Consultation',
     ctaHref: '/booking',
     highlight: false,
   },
@@ -109,30 +101,28 @@ export default function OnlineCoaching() {
       </AnimatedSection>
 
       <AnimatedSection className="coaching-tiers">
-        <h2 className="heading-pop">Coaching Options &amp; Pricing</h2>
+        <h2 className="heading-pop">Coaching Options</h2>
         <div className="coaching-tier-grid">
           {TIERS.map((tier) => (
             <div key={tier.id} className={`coaching-tier-card ${tier.highlight ? 'coaching-tier-card--featured' : ''}`}>
               {tier.badge && <span className="coaching-tier-badge">{tier.badge}</span>}
               <h3 className="coaching-tier-name">{tier.name}</h3>
-              <div className="coaching-tier-price">
-                <span className="coaching-tier-amount">{tier.price}</span>
-                <span className="coaching-tier-per">{tier.per}</span>
-              </div>
+              {tier.price && (
+                <div className="coaching-tier-price">
+                  <span className="coaching-tier-amount">{tier.price}</span>
+                  <span className="coaching-tier-per">{tier.per}</span>
+                </div>
+              )}
               <p className="coaching-tier-tagline">{tier.tagline}</p>
               <ul className="coaching-tier-includes">
-                {tier.includes.map((item) =>
-                  typeof item === 'string' ? (
-                    <li key={item}>{item}</li>
-                  ) : (
-                    <li
-                      key={item.text}
-                      className={`${item.yes ? 'feat-yes' : 'feat-no'}${item.exclusive ? ' feat-exclusive' : ''}`}
-                    >
-                      {item.text}
-                    </li>
-                  )
-                )}
+                {tier.includes.map((item) => (
+                  <li
+                    key={item.text}
+                    className={`${item.yes ? 'feat-yes' : 'feat-no'}${item.exclusive ? ' feat-exclusive' : ''}`}
+                  >
+                    {item.text}
+                  </li>
+                ))}
               </ul>
               {tier.bonus && (
                 <p className="coaching-tier-bonus">

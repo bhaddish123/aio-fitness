@@ -6,13 +6,11 @@ const PACKAGES = [
   {
     id: 'programming-plus',
     label: 'Programming Plus',
-    price: '$250/month',
     note: null,
   },
   {
     id: 'aio-coaching',
     label: 'All-In-One Coaching',
-    price: '$500/month',
     note: null,
   },
 ];
@@ -146,7 +144,6 @@ export default function CoachingApply() {
                   onChange={handleChange}
                 />
                 <span className="apply-package-name">{pkg.label}</span>
-                <span className="apply-package-price">{pkg.price}</span>
               </label>
             ))}
           </div>

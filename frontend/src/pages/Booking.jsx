@@ -20,7 +20,6 @@ const initialForm = {
   helpNeeded: [],
   helpNeededOther: '',
   intakeNotes: '',
-  waiverAccepted: false,
 };
 
 const formatTime = (iso) =>
@@ -541,26 +540,6 @@ export default function Booking() {
                               value={form.intakeNotes} onChange={handleFormChange}
                               placeholder="Any injuries, scheduling constraints, or questions for Everett"
                               rows={3} />
-                          </div>
-
-                          <div className="waiver-block">
-                            <h3 className="waiver-title">Liability Waiver &amp; Policies</h3>
-                            <div className="waiver-body">
-                              <p><strong>Assumption of Risk</strong><br />
-                              I voluntarily participate in personal training sessions with AIO Fitness and acknowledge the inherent risks of physical exercise, including the possibility of injury, illness, or harm.</p>
-                              <p><strong>Medical Clearance</strong><br />
-                              I confirm that I am in adequate physical health to participate in these sessions. If I have any known medical conditions, I have consulted or will consult a physician before training.</p>
-                              <p><strong>Release of Liability</strong><br />
-                              I release AIO Fitness and its trainer from any liability for injury, illness, or loss arising from my participation in training sessions, including claims related to negligence.</p>
-                              <p><strong>Cancellation &amp; Refund Policy</strong><br />
-                              Cancellations made more than 24 hours before a session receive a full refund. Cancellations within 24 hours of the session are non-refundable. No-shows are non-refundable.</p>
-                            </div>
-                            <label className="waiver-checkbox-label">
-                              <input type="checkbox" name="waiverAccepted"
-                                checked={form.waiverAccepted} onChange={handleFormChange} />
-                              I have read and agree to the liability waiver and cancellation policy above.
-                            </label>
-                            {errors.waiverAccepted && <p className="field-error">{errors.waiverAccepted}</p>}
                           </div>
 
                           <div className="step-nav-buttons">

@@ -555,6 +555,19 @@
   background: var(--gray-50);
 }
 
+/* Soft fade at the top and bottom edges of the coach photo so it
+   blends into the panel background instead of ending in a hard line. */
+.focus-panel-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, var(--gray-50) 0%, transparent 12%),
+    linear-gradient(to top, var(--gray-50) 0%, transparent 12%);
+}
+
 /* Mask — clips the reveal below, and is the element the continuous
    scroll-parallax transform (set imperatively in Home.jsx) lands on.
    Kept separate from the one-time "peekaboo" reveal animation below

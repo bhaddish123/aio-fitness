@@ -256,7 +256,6 @@ export default function Home() {
               <span className="plan-card-eyebrow">PERSONALIZED PROGRAMMING</span>
               <h3 className="plan-card-name">Programming+</h3>
               <div className="plan-card-divider" />
-              <div className="plan-card-price">$250<span>/month</span></div>
               <ul className="plan-card-features">
                 <li className="feat-yes">Personalized Workout Program</li>
                 <li className="feat-yes">Personalized Program Adjustments</li>
@@ -267,7 +266,6 @@ export default function Home() {
                 <li className="feat-no">Personalized Nutrition Coaching</li>
                 <li className="feat-no">Lifestyle &amp; Mindset Coaching</li>
                 <li className="feat-no">Accountability Coaching</li>
-                <li className="feat-no">Complimentary Virtual Session</li>
               </ul>
               <Link to="/coaching/apply?package=programming-plus" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
                 <button className="cta-button-outline">Get Started</button>
@@ -277,7 +275,6 @@ export default function Home() {
               <span className="plan-card-eyebrow">COMPLETE COACHING</span>
               <h3 className="plan-card-name">All-In-One Coaching</h3>
               <div className="plan-card-divider" />
-              <div className="plan-card-price">$500<span>/month</span></div>
               <ul className="plan-card-features">
                 <li className="feat-yes">Personalized Workout Program</li>
                 <li className="feat-yes">Personalized Program Adjustments</li>
@@ -288,7 +285,6 @@ export default function Home() {
                 <li className="feat-yes feat-exclusive">Personalized Nutrition Coaching</li>
                 <li className="feat-yes feat-exclusive">Lifestyle &amp; Mindset Coaching</li>
                 <li className="feat-yes feat-exclusive">Accountability Coaching</li>
-                <li className="feat-yes feat-exclusive">Complimentary 60-Min Virtual Session</li>
               </ul>
               <Link to="/coaching/apply?package=aio-coaching" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
                 <button className="cta-button">Apply Now</button>

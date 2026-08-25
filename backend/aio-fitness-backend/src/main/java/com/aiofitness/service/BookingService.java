@@ -60,10 +60,6 @@ public class BookingService {
     }
     @Transactional
     public synchronized Booking reserveSlot(ReserveBookingRequest request) {
-        if (!request.isWaiverAccepted()) {
-            throw new RuntimeException("You must accept the waiver and policy to book a session");
-        }
-
         if (request.getHelpNeeded().contains(HelpNeededOption.OTHER)
                 && (request.getHelpNeededOther() == null || request.getHelpNeededOther().isBlank())) {
             throw new RuntimeException("Please specify what 'Other' refers to");
