@@ -5,7 +5,7 @@ import { API_BASE_URL } from '../utils/constants';
 const PACKAGES = [
   {
     id: 'programming-plus',
-    label: 'Programming Plus',
+    label: 'Programming +',
     note: null,
   },
   {

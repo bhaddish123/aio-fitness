@@ -44,7 +44,7 @@ const TIERS = [
   {
     id: 'programming-plus',
     badge: null,
-    name: 'Programming Plus',
+    name: 'Programming+',
     tagline: 'For clients who want a personalized training plan, clear direction, and the structure to train more independently.',
     includes: [
       { text: 'Full All-In-One Fitness App Access',                            yes: true },
