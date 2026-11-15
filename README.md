@@ -1,62 +1,109 @@
-# All In One Fitness — Booking Platform
+# AIO Fitness
 
-Full-stack session booking platform for Everett Lee Fitness. Clients can browse session types, select availability, complete intake forms, and pay via Stripe. Everett manages bookings, schedule, and site content through a protected admin panel.
+Booking and payments platform for a fitness coaching business, live at [https://everettleecoaching.com](https://everettleecoaching.com). Clients browse the public site, reserve a session, and pay with Stripe Checkout (a session priced at 0 is confirmed without Stripe). The coach uses a JWT admin panel to manage bookings, the weekly schedule, and site content.
 
----
+Clients do not have accounts. A booking is cancelled with a one-time token, and there is a single admin login from `ADMIN_USERNAME` and `ADMIN_PASSWORD`. Coaching applications are emailed to the coach; the app does not bill subscriptions or deliver training programs. The public contact form is a `mailto:` link and is not stored.
+
+## Features
+
+**Clients**
+
+- Public pages: home, about, FAQ, client results, and online coaching.
+- Booking: pick an active session type, pick a slot, submit contact details and a fitness intake form, and accept a waiver.
+- Slots are generated from weekly availability rules for the next 30 days in `America/New_York`, plus admin overrides. A slot must start at least 6 hours out. When Google Calendar is configured, busy intervals are removed from the list.
+- Reserving a slot creates a `RESERVED` booking held for 5 minutes (`reservedUntil` is now plus 300 seconds). A scheduled job deletes expired reservations every minute.
+- Paid sessions redirect to Stripe Checkout. The `checkout.session.completed` webhook confirms the booking, sends email, and creates a calendar event. If the hold has already expired, the payment is refunded and the booking is not confirmed. A price of 0 skips Stripe and is confirmed immediately.
+- Email to the client: confirmation, a reminder about 24 hours before the start, a reminder about 2 hours before, and a follow-up once the start time is 30 minutes in the past. Cancelling with the token issues a Stripe refund only when the session is more than 24 hours away.
+- The results page shows transformation photos and videos stored as site content. The coaching apply form posts to `/inquiries`.
+
+**Admin** (`/login`, then `/admin/*`)
+
+- Dashboard with booking counts and a recent list.
+- Bookings: list, change status, and cancel with a Stripe refund (same 24-hour refund rule as the client token).
+- Schedule: edit weekly availability rules, and add or block individual slots. A block is also written to Google Calendar when calendar credentials are set.
+- Content: about copy and photo, home hero photo and video, a focus photo, FAQ entries, and transformation media (crop and trim in the browser).
+- Login attempts are limited in memory to 5 failures per username in 15 minutes.
 
 ## Tech Stack
 
-**Frontend**
-- React 18 + Vite
-- React Router v6
-- Plain CSS (custom design system, no Tailwind)
-- Stripe Checkout redirect flow
+### Frontend
 
-**Backend**
-- Java 21 / Spring Boot 3.5
-- Spring Security (JWT, stateless)
-- PostgreSQL on AWS RDS
-- Flyway (database migrations)
-- JavaMailSender (Gmail SMTP)
-- Google Calendar API (service account)
-- Stripe Java SDK
+- React 18, Vite 5, React Router 6
+- axios, date-fns, framer-motion, lucide-react, react-big-calendar, react-easy-crop
+- Plain CSS
+- ESLint (`npm run lint`)
 
----
+### Backend
+
+- Java 21, Spring Boot 3.5
+- Spring Security with stateless JWT (jjwt)
+- Spring Data JPA, Hibernate `ddl-auto: validate`, Bean Validation
+- PostgreSQL and Flyway migrations `V0` through `V12`
+- Stripe (`stripe-java`) and Gmail SMTP (`JavaMailSender`)
+- Google Calendar API via a service account (optional; booking still works if unset)
+- Scheduled jobs for reservation cleanup and reminder email
+
+### Infrastructure
+
+- The API listens on port 8080. CORS allows `http://localhost:5173`, `https://everettleecoaching.com`, and `https://www.everettleecoaching.com`.
+- `frontend/vercel.json` rewrites every path to `index.html`.
+- The frontend reads `VITE_API_BASE_URL`. If it is unset, `frontend/src/utils/constants.js` uses `http://localhost:8080`.
 
 ## Project Structure
 
-```
+```txt
 aio-fitness/
-├── frontend/                  # React/Vite app
+├── frontend/
+│   ├── vercel.json                 # SPA rewrite
 │   └── src/
-│       ├── pages/             # Home, About, Booking, Coaching, FAQ, Admin...
-│       ├── components/        # Navigation, Footer, StickySocialSidebar...
-│       ├── services/          # bookingService, scheduleService (axios)
-│       ├── styles/            # CSS design system (variables, components...)
-│       └── utils/constants.js # API base URL, endpoints
-│
+│       ├── pages/                  # public pages, booking, admin
+│       ├── components/
+│       ├── services/               # axios clients
+│       └── utils/constants.js      # API_BASE_URL
 └── backend/aio-fitness-backend/
-    ├── src/main/java/com/aiofitness/
-    │   ├── controller/        # REST endpoints
-    │   ├── service/           # Business logic, email, Stripe, Calendar
-    │   ├── model/             # JPA entities
-    │   ├── dto/               # Request/response objects
-    │   └── config/            # Security, JWT, Stripe, CORS
-    └── src/main/resources/
-        ├── application.yml    # App config (reads from env vars)
-        └── db/migration/      # Flyway SQL migrations (V0–V7)
+    ├── start.sh                    # source .env, then ./mvnw spring-boot:run
+    ├── pom.xml
+    └── src/
+        ├── main/java/com/aiofitness/    # controllers, services, models
+        ├── main/resources/
+        │   ├── application.yml
+        │   └── db/migration/       # Flyway V0–V12
+        └── test/java/com/aiofitness/
 ```
 
----
+## Run locally
 
-## Local Setup
+Needs Java 21, Node and npm, and PostgreSQL. `application.yml` binds the names below. `./start.sh` sources `backend/aio-fitness-backend/.env`, which is gitignored.
 
-### Prerequisites
-- Node 18+
-- Java 21
-- Maven (via `./mvnw`)
+`.env.example` lists `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Those names are not in `application.yml`.
 
-### Frontend
+Required:
+
+- `SPRING_DATASOURCE_URL`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
+- `MAIL_USERNAME`
+- `MAIL_PASSWORD`
+- `STRIPE_API_KEY`
+- `JWT_SECRET`
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
+
+Optional (a default is set in `application.yml`, or the feature is skipped when blank):
+
+- `STRIPE_WEBHOOK_SECRET`
+- `APP_BASE_URL`
+- `NOTIFY_EMAIL`
+- `GOOGLE_CALENDAR_ID`
+- `GOOGLE_CALENDAR_CREDENTIALS_JSON`
+- `VITE_API_BASE_URL` (frontend)
+
+```bash
+cd backend/aio-fitness-backend
+./start.sh
+```
+
+Flyway runs on startup. The API is at `http://localhost:8080`.
 
 ```bash
 cd frontend
@@ -64,118 +111,21 @@ npm install
 npm run dev
 ```
 
-Runs at `http://localhost:5173`.
+The Vite dev server is at `http://localhost:5173`.
 
-### Backend
+To forward Stripe webhooks:
 
-1. Create `backend/aio-fitness-backend/.env` with all required variables (see below)
-2. Run:
+```bash
+stripe listen --forward-to localhost:8080/webhook/stripe
+```
+
+## Test
+
+The frontend `package.json` has no test script. Backend:
 
 ```bash
 cd backend/aio-fitness-backend
-./start.sh
+./mvnw test
 ```
 
-`start.sh` loads `.env` and starts Spring Boot. Flyway migrations run automatically on startup. Runs at `http://localhost:8080`.
-
----
-
-## Environment Variables
-
-Create `backend/aio-fitness-backend/.env`. Never commit this file — it is gitignored.
-
-```
-# Database
-SPRING_DATASOURCE_URL=jdbc:postgresql://<host>:5432/<db>
-SPRING_DATASOURCE_USERNAME=
-SPRING_DATASOURCE_PASSWORD=
-
-# Gmail SMTP (sends automated emails)
-MAIL_USERNAME=
-MAIL_PASSWORD=       # Gmail App Password — requires 2FA enabled on the account
-NOTIFY_EMAIL=        # Where Everett receives inquiry notifications
-
-# Stripe
-STRIPE_API_KEY=
-STRIPE_WEBHOOK_SECRET=
-
-# JWT
-JWT_SECRET=          # Any long random base64 string
-
-# Admin login
-ADMIN_USERNAME=
-ADMIN_PASSWORD=
-
-# App
-APP_BASE_URL=http://localhost:5173
-
-# Google Calendar (optional — skip to disable calendar sync)
-GOOGLE_CALENDAR_ID=
-GOOGLE_CALENDAR_CREDENTIALS_JSON=
-```
-
----
-
-## Booking Flow
-
-1. Client picks a session type → selects an available slot
-2. Fills out contact info + fitness intake form + waiver
-3. Backend reserves the slot (15-min hold) + creates Stripe Checkout session
-4. Client pays → Stripe webhook fires → booking confirmed
-5. Confirmation email sent to client; slot blocked on Google Calendar
-
----
-
-## Email Flow
-
-All emails sent from `MAIL_USERNAME` via Gmail SMTP.
-
-| Trigger | Recipient |
-|---|---|
-| Booking confirmed | Client |
-| Booking cancelled | Client |
-| 24-hour reminder | Client |
-| 2-hour reminder | Client |
-| Post-session follow-up | Client |
-| Coaching inquiry submitted | `NOTIFY_EMAIL` + client confirmation |
-
----
-
-## Admin Panel (`/admin`)
-
-JWT-protected. Login at `/login`.
-
-- **Bookings** — view all, update status, issue refunds
-- **Schedule** — monthly calendar, per-day slot modal, add/block overrides
-- **Content** — edit bio, testimonials (live on site immediately)
-
----
-
-## Database Migrations
-
-Flyway runs on startup. Never edit existing migration files — always add a new versioned file.
-
-| Version | Description |
-|---|---|
-| V0 | Baseline schema |
-| V1 | Client intake fields |
-| V2 | Drop legacy unique constraint |
-| V3 | Admin user table |
-| V4 | Site content table |
-| V5 | Google Calendar event ID column |
-| V6 | Seed real session types + availability rules (Mon–Sat 7am–2pm) |
-| V7 | Add Virtual Training Session type |
-
----
-
-## Pending Before Launch
-
-- [ ] Real Gmail App Password → `MAIL_PASSWORD` in `.env`
-- [ ] Stripe live keys → swap `STRIPE_API_KEY` to `sk_live_...`
-- [ ] Stripe webhook secret → from Stripe CLI or dashboard
-- [ ] Google Calendar → share Everett's calendar with service account, add credentials to `.env`
-- [ ] Professional photos from Everett → replace hero/about placeholders
-- [ ] Testimonials → enter via admin panel → Content tab
-- [ ] Deploy frontend → Vercel
-- [ ] Deploy backend → Railway
-- [ ] Connect custom domain
+`LoginAttemptServiceTest` does not start Spring. `AioFitnessBackendApplicationTests` loads the application context, so the datasource variables must point at a reachable database.
