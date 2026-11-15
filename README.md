@@ -1,170 +1,131 @@
-# All In One Fitness — Booking Platform
+# AIO Fitness
 
-Full-stack session booking platform built for Everett Lee Fitness. Clients browse session types, pick an available slot, complete an intake form, and pay with Stripe Checkout. The coach manages bookings, the weekly schedule, and site content from a JWT-protected admin panel.
+Booking and payments platform for a fitness coaching business, live at [https://everettleecoaching.com](https://everettleecoaching.com). Clients browse the public site, reserve a session, and pay with Stripe Checkout (a session priced at 0 is confirmed without Stripe). The coach uses a JWT admin panel to manage bookings, the weekly schedule, and site content.
 
-**Live site:** [everettleecoaching.com](https://everettleecoaching.com)
+Clients do not have accounts. A booking is cancelled with a one-time token, and there is a single admin login from `ADMIN_USERNAME` and `ADMIN_PASSWORD`. Coaching applications are emailed to the coach; the app does not bill subscriptions or deliver training programs. The public contact form is a `mailto:` link and is not stored.
 
-> This repo is the product I shipped and still maintain as sole developer (infrastructure, backend, frontend, and ongoing support). An earlier iteration lives in [`a3fit`](https://github.com/bhaddish123/a3fit).
+## Features
 
----
+**Clients**
 
-## Tech stack
+- Public pages: home, about, FAQ, client results, and online coaching.
+- Booking: pick an active session type, pick a slot, submit contact details and a fitness intake form, and accept a waiver.
+- Slots are generated from weekly availability rules for the next 30 days in `America/New_York`, plus admin overrides. A slot must start at least 6 hours out. When Google Calendar is configured, busy intervals are removed from the list.
+- Reserving a slot creates a `RESERVED` booking held for 5 minutes (`reservedUntil` is now plus 300 seconds). A scheduled job deletes expired reservations every minute.
+- Paid sessions redirect to Stripe Checkout. The `checkout.session.completed` webhook confirms the booking, sends email, and creates a calendar event. If the hold has already expired, the payment is refunded and the booking is not confirmed. A price of 0 skips Stripe and is confirmed immediately.
+- Email to the client: confirmation, a reminder about 24 hours before the start, a reminder about 2 hours before, and a follow-up once the start time is 30 minutes in the past. Cancelling with the token issues a Stripe refund only when the session is more than 24 hours away.
+- The results page shows transformation photos and videos stored as site content. The coaching apply form posts to `/inquiries`.
 
-| Layer | Choices in this repo |
-|---|---|
-| Frontend | React 18, Vite, React Router v6, plain CSS (no Tailwind), axios, date-fns, react-big-calendar, framer-motion |
-| Backend | Java 21, Spring Boot 3.5, Spring Security (stateless JWT), Bean Validation |
-| Data | PostgreSQL (AWS RDS in production), Flyway migrations (`V0`–`V12`) |
-| Payments | Stripe Checkout + webhooks (`stripe-java`) |
-| Email | JavaMailSender via Gmail SMTP (confirmation, reminders, cancellation, inquiries) |
-| Calendar | Google Calendar API via a service account (optional — booking still works if unset) |
-| Hosting | Frontend on Vercel (`frontend/vercel.json` SPA rewrites). Production API is served at `https://api.everettleecoaching.com`. |
+**Admin** (`/login`, then `/admin/*`)
 
----
+- Dashboard with booking counts and a recent list.
+- Bookings: list, change status, and cancel with a Stripe refund (same 24-hour refund rule as the client token).
+- Schedule: edit weekly availability rules, and add or block individual slots. A block is also written to Google Calendar when calendar credentials are set.
+- Content: about copy and photo, home hero photo and video, a focus photo, FAQ entries, and transformation media (crop and trim in the browser).
+- Login attempts are limited in memory to 5 failures per username in 15 minutes.
 
-## Architecture
+## Tech Stack
 
-```
-Browser (everettleecoaching.com)
-    │  axios
-    ▼
-Spring Boot API
-    ├── Public: session types, availability, reserve, checkout, cancel-by-token,
-    │           site content, coaching inquiries, Stripe webhook
-    ├── Admin (JWT): bookings, refunds, availability rules, schedule overrides, content
-    ├── PostgreSQL + Flyway
-    ├── Stripe Checkout / refunds / webhook signature check
-    └── Google Calendar (create / delete events, FreeBusy for slot filtering)
-```
+### Frontend
 
-### Booking flow
-
-1. Client chooses a session type and an available slot (slots are generated from weekly availability rules for the next 30 days, plus admin overrides). Slots must be at least 6 hours in the future. Google Calendar busy intervals are subtracted from the list when Calendar is configured.
-2. Client submits contact info, a fitness intake form, and a waiver.
-3. The backend creates a `RESERVED` booking and holds the slot for **5 minutes** (`reservedUntil = now + 300s`). A scheduled job deletes expired reservations once a minute.
-4. For paid sessions, the client is sent to Stripe Checkout. A `checkout.session.completed` webhook confirms the booking, sends email, and creates a Calendar event.
-5. Free sessions (price `0`, e.g. a complimentary consultation) skip Stripe and are confirmed immediately.
-6. Confirmation, 24-hour and 2-hour reminders, and a post-session follow-up are sent by a scheduler. Clients can cancel with a unique token (no refund if cancelled within 24 hours of the session).
-
----
-
-## Project structure
-
-```
-aio-fitness/
-├── frontend/                         # React + Vite app
-│   └── src/
-│       ├── pages/                    # Home, About, FAQ, Booking, Coaching, Results,
-│       │                             # Login, Success, Cancel, Admin (dashboard, bookings,
-│       │                             # schedule, content)
-│       ├── components/               # Navigation, Footer, ProtectedRoute, …
-│       ├── services/                 # axios API clients
-│       ├── styles/                   # CSS design system
-│       └── utils/constants.js        # API_BASE_URL and route helpers
-└── backend/aio-fitness-backend/
-    ├── start.sh                      # sources .env, then ./mvnw spring-boot:run
-    ├── src/main/java/com/aiofitness/
-    │   ├── controller/               # REST endpoints
-    │   ├── service/                  # Booking, availability, email, calendar, cleanup
-    │   ├── model/                    # JPA entities
-    │   ├── dto/                      # Request/response objects
-    │   └── config/                   # Security, JWT, Stripe, CORS, exception handler
-    └── src/main/resources/
-        ├── application.yml           # Config from environment variables
-        └── db/migration/             # Flyway SQL (V0–V12)
-```
-
----
-
-## Running locally
-
-**Prerequisites:** Node 18+, Java 21, PostgreSQL, and the [Stripe CLI](https://stripe.com/docs/stripe-cli) if you want to test webhooks.
+- React 18, Vite 5, React Router 6
+- axios, date-fns, framer-motion, lucide-react, react-big-calendar, react-easy-crop
+- Plain CSS
+- ESLint (`npm run lint`)
 
 ### Backend
 
-`application.yml` reads these variable names (this is what Spring Boot actually binds). Create `backend/aio-fitness-backend/.env` — it is gitignored — and start with `./start.sh`, which `source`s that file.
+- Java 21, Spring Boot 3.5
+- Spring Security with stateless JWT (jjwt)
+- Spring Data JPA, Hibernate `ddl-auto: validate`, Bean Validation
+- PostgreSQL and Flyway migrations `V0` through `V12`
+- Stripe (`stripe-java`) and Gmail SMTP (`JavaMailSender`)
+- Google Calendar API via a service account (optional; booking still works if unset)
+- Scheduled jobs for reservation cleanup and reminder email
 
-```bash
-# Database
-SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/aio_fitness
-SPRING_DATASOURCE_USERNAME=postgres
-SPRING_DATASOURCE_PASSWORD=
+### Infrastructure
 
-# Gmail SMTP
-MAIL_USERNAME=
-MAIL_PASSWORD=          # Gmail App Password
-NOTIFY_EMAIL=           # where inquiry / booking notifications go
+- The API listens on port 8080. CORS allows `http://localhost:5173`, `https://everettleecoaching.com`, and `https://www.everettleecoaching.com`.
+- `frontend/vercel.json` rewrites every path to `index.html`.
+- The frontend reads `VITE_API_BASE_URL`. If it is unset, `frontend/src/utils/constants.js` uses `http://localhost:8080`.
 
-# Stripe
-STRIPE_API_KEY=
-STRIPE_WEBHOOK_SECRET=  # required in any environment that receives live webhooks
+## Project Structure
 
-# JWT and admin login
-JWT_SECRET=             # long random Base64 string (HS256 key material)
-ADMIN_USERNAME=
-ADMIN_PASSWORD=
-
-# Frontend origin, used in Stripe success/cancel URLs
-APP_BASE_URL=http://localhost:5173
-
-# Google Calendar (optional — leave blank to skip sync)
-GOOGLE_CALENDAR_ID=
-GOOGLE_CALENDAR_CREDENTIALS_JSON=   # full service-account JSON, one line
+```txt
+aio-fitness/
+├── frontend/
+│   ├── vercel.json                 # SPA rewrite
+│   └── src/
+│       ├── pages/                  # public pages, booking, admin
+│       ├── components/
+│       ├── services/               # axios clients
+│       └── utils/constants.js      # API_BASE_URL
+└── backend/aio-fitness-backend/
+    ├── start.sh                    # source .env, then ./mvnw spring-boot:run
+    ├── pom.xml
+    └── src/
+        ├── main/java/com/aiofitness/    # controllers, services, models
+        ├── main/resources/
+        │   ├── application.yml
+        │   └── db/migration/       # Flyway V0–V12
+        └── test/java/com/aiofitness/
 ```
+
+## Run locally
+
+Needs Java 21, Node and npm, and PostgreSQL. `application.yml` binds the names below. `./start.sh` sources `backend/aio-fitness-backend/.env`, which is gitignored.
+
+`.env.example` lists `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Those names are not in `application.yml`.
+
+Required:
+
+- `SPRING_DATASOURCE_URL`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
+- `MAIL_USERNAME`
+- `MAIL_PASSWORD`
+- `STRIPE_API_KEY`
+- `JWT_SECRET`
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
+
+Optional (a default is set in `application.yml`, or the feature is skipped when blank):
+
+- `STRIPE_WEBHOOK_SECRET`
+- `APP_BASE_URL`
+- `NOTIFY_EMAIL`
+- `GOOGLE_CALENDAR_ID`
+- `GOOGLE_CALENDAR_CREDENTIALS_JSON`
+- `VITE_API_BASE_URL` (frontend)
 
 ```bash
 cd backend/aio-fitness-backend
 ./start.sh
 ```
 
-The API listens on `http://localhost:8080`. Flyway runs on startup (`ddl-auto: validate`).
+Flyway runs on startup. The API is at `http://localhost:8080`.
 
-> Note: `.env.example` currently uses `DB_URL` / `DB_USERNAME` / `DB_PASSWORD`. Those names are **not** the ones in `application.yml`. Use the `SPRING_DATASOURCE_*` names above, or the datasource will not be configured.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-To forward Stripe webhooks locally:
+The Vite dev server is at `http://localhost:5173`.
+
+To forward Stripe webhooks:
 
 ```bash
 stripe listen --forward-to localhost:8080/webhook/stripe
 ```
 
-### Frontend
+## Test
+
+The frontend `package.json` has no test script. Backend:
 
 ```bash
-cd frontend
-npm install
-# optional: echo 'VITE_API_BASE_URL=http://localhost:8080' > .env
-npm run dev
+cd backend/aio-fitness-backend
+./mvnw test
 ```
 
-The app runs at `http://localhost:5173`. If `VITE_API_BASE_URL` is unset, it defaults to `http://localhost:8080`. The production build is configured to call `https://api.everettleecoaching.com`.
-
-CORS on the API allows `http://localhost:5173`, `https://everettleecoaching.com`, and `https://www.everettleecoaching.com`.
-
----
-
-## Admin panel
-
-Sign in at `/login`. Routes under `/admin/*` are wrapped in a frontend `ProtectedRoute` and require a Bearer JWT from `POST /admin/login`.
-
-- **Dashboard / bookings** — list bookings, update status, issue refunds
-- **Schedule** — monthly calendar, per-day slots, add or block overrides (blocks can also be written to Google Calendar)
-- **Content** — edit site copy stored in `site_content`
-
-Login attempts are rate-limited in memory (5 failures / 15 minutes per username).
-
----
-
-## Highlights that are in the code
-
-- Availability is computed from recurring weekly rules, not a static table of slots. Admin overrides can block a slot or add a one-off slot outside the rules.
-- Reservations are short-lived; a cleanup scheduler removes expired `RESERVED` rows.
-- Stripe webhooks are signature-checked and the confirm path is idempotent if the booking is already `CONFIRMED`.
-- Client-supplied strings in HTML email bodies are passed through `HtmlUtils.htmlEscape`.
-- Google Calendar failures are logged and must not roll back a confirmed, paid booking.
-- Intake data (age, experience, goals, etc.) is stored on the booking and validated with Bean Validation / DB check constraints.
-
----
-
-## License
-
-Private client work. Ask before reusing.
+`LoginAttemptServiceTest` does not start Spring. `AioFitnessBackendApplicationTests` loads the application context, so the datasource variables must point at a reachable database.
