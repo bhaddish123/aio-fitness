@@ -570,7 +570,7 @@
 /* About hero: keep the photo clear of the floating nav */
 .rd .split-hero .meet-photo.has-photo .photo { inset: 0; height: 100%; object-position: 50% 0%; transform: none; animation: none; }
 .rd .split-hero .meet-photo.has-photo .photo-shade { top: 0; }
-@media (max-width: 1080px) { .rd .split-hero .meet-photo { min-height: 0; height: 460px; } .rd .split-hero { min-height: 0; } .rd .split-hero .split-copy { padding-top: 56px; padding-bottom: 72px; } }
+@media (max-width: 1080px) { .rd .split-hero .meet-photo { min-height: 0; height: auto; aspect-ratio: 4 / 3; } .rd .split-hero { min-height: 0; } .rd .split-hero .split-copy { padding-top: 56px; padding-bottom: 72px; } }
 
 
 
