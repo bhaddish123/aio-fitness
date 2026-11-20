@@ -11,17 +11,19 @@ export default function ScrollToTop() {
   }, []);
 
   return (
-    <button
-      type="button"
-      className={`scroll-to-top ${visible ? 'scroll-to-top-visible' : ''}`}
-      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      aria-label="Scroll to top"
-      aria-hidden={!visible}
-      tabIndex={visible ? 0 : -1}
-    >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="18 15 12 9 6 15" />
-      </svg>
-    </button>
+    <div className="rd">
+      <button
+        type="button"
+        className={`to-top ${visible ? '' : 'is-hidden'}`}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        aria-label="Scroll to top"
+        aria-hidden={!visible}
+        tabIndex={visible ? 0 : -1}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M18 15l-6-6-6 6" />
+        </svg>
+      </button>
+    </div>
   );
 }

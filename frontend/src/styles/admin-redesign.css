@@ -1,0 +1,49 @@
+/* Admin + login: lighter restyle on top of admin.css (same layout and markup). */
+.admin-dashboard h1, .manage-bookings h1, .manage-schedule h1, .manage-content h1, .login-page h1 {
+  font: 400 clamp(44px, 4.6vw, 68px)/0.95 var(--display); text-transform: uppercase; letter-spacing: 0.005em;
+  border-left: 0; padding-left: 0;
+}
+.admin-dashboard h1 span, .manage-bookings h1 span, .manage-schedule h1 span, .manage-content h1 span, .login-page h1 span {
+  background: var(--metal); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.admin-dashboard h2 { font: 700 13px/1 var(--mono); letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); }
+
+.dashboard-stats { gap: 16px; border: 0; background: none; box-shadow: none; }
+.stat-card { border-radius: 22px; border: 1px solid var(--line); background: linear-gradient(180deg, #16150f, #0f0e0b); position: relative; overflow: hidden; }
+.stat-card::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, var(--gold), transparent); }
+.stat-card h3 { font: 600 11px/1 var(--mono); letter-spacing: 0.2em; color: var(--dim); }
+.stat-card h3::before { display: none; }
+.stat-card p { font: 400 56px/1 var(--display); color: var(--gold-hi); }
+
+.dashboard-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.dashboard-nav h2 { grid-column: 1 / -1; }
+.dashboard-nav a { border-radius: 20px; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.02); transition: border-color 0.3s, transform 0.4s var(--ease), background 0.3s; }
+.dashboard-nav a:hover { border-color: rgba(212, 175, 55, 0.5); background: rgba(212, 175, 55, 0.06); transform: translateY(-3px); }
+
+.table-scroll { border-radius: 22px; border: 1px solid var(--line); overflow: auto; }
+.bookings-table { border: 0; border-radius: 0; background: linear-gradient(180deg, #15140f, #0f0e0b); }
+.bookings-table thead { border-top: 0; }
+.bookings-table th { font: 600 11px/1 var(--mono); letter-spacing: 0.18em; color: var(--dim); border-bottom: 1px solid rgba(212, 175, 55, 0.35); }
+.bookings-table tbody tr:hover { background: rgba(212, 175, 55, 0.04); }
+.recent-bookings .bookings-table { border-radius: 22px; overflow: hidden; border: 1px solid var(--line); }
+
+.status-pill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border-radius: 999px; border: 1px solid; font: 700 10.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; }
+.status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.status-CONFIRMED { color: #7fd6a0; border-color: rgba(127, 214, 160, 0.35); background: rgba(127, 214, 160, 0.08); }
+.status-RESERVED  { color: var(--gold-hi); border-color: rgba(212, 175, 55, 0.4); background: rgba(212, 175, 55, 0.08); }
+.status-CANCELLED { color: #a9a49a; border-color: rgba(169, 164, 154, 0.3); background: rgba(169, 164, 154, 0.06); }
+.status-REFUNDED  { color: #8db4ff; border-color: rgba(141, 180, 255, 0.35); background: rgba(141, 180, 255, 0.07); }
+.status-COMPLETED { color: #c9c4b8; border-color: rgba(201, 196, 184, 0.3); background: rgba(201, 196, 184, 0.06); }
+
+.action-buttons button { border-radius: 999px; }
+.content-tabs { gap: 6px; padding: 5px; border-radius: 999px; border: 1px solid var(--line); width: fit-content; }
+.content-tab-btn { border-radius: 999px; border: 0; }
+.content-section { border-radius: 22px; border: 1px solid var(--line); border-left: 1px solid var(--line); background: linear-gradient(180deg, #15140f, #0f0e0b); }
+.content-section button, .photo-upload-btn { border-radius: 999px; }
+
+.login-form { border-radius: 28px; border: 1.5px solid transparent; background: linear-gradient(180deg, #1b1912, #110f0b) padding-box, conic-gradient(from var(--ang), rgba(212, 175, 55, 0.2), var(--gold-hi), rgba(212, 175, 55, 0.2) 30%, rgba(212, 175, 55, 0.2) 70%, var(--gold), rgba(212, 175, 55, 0.2)) border-box; animation: spinBorder 9s linear infinite; }
+.login-form button[type='submit'] { border-radius: 999px; background: var(--metal); }
+
+@media (max-width: 900px) { .dashboard-nav { grid-template-columns: minmax(0, 1fr); } }
+/* Clear the floating nav. */
+.admin-dashboard, .manage-bookings, .manage-schedule, .manage-content { padding-top: 140px; }

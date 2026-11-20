@@ -1,26 +1,29 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
-import { useInView } from '../hooks/useInView';
+import { useEffect, useState } from 'react';
 import { API_BASE_URL } from '../utils/constants';
-import iconBody      from '../assets/icons/icon-body.png';
-import iconMindset   from '../assets/icons/icon-mindset.png';
-import iconLifestyle from '../assets/icons/icon-lifestyle.png';
-import iconHealth    from '../assets/icons/icon-health.png';
-import iconCoaching  from '../assets/icons/icon-coaching.png';
-import iconNutrition from '../assets/icons/icon-nutrition.png';
+import logo from '../assets/A1_logo_transparent.png';
+import { Arrow, Check, XMark, spotlight } from '../components/RedesignBits';
 
-const PHOTO_CACHE_KEY      = 'aio_fitness_hero_photo';
-const VIDEO_CACHE_KEY      = 'aio_fitness_hero_video';
+const PHOTO_CACHE_KEY       = 'aio_fitness_hero_photo';
+const VIDEO_CACHE_KEY       = 'aio_fitness_hero_video';
 const FOCUS_PHOTO_CACHE_KEY = 'aio_fitness_focus_photo';
 
+const ICONS = {
+  body: <><path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11" /></>,
+  mind: <><path d="M12 3a7 7 0 0 0-4 12.7V19h8v-3.3A7 7 0 0 0 12 3z" /><path d="M9.5 22h5M12 8v4l2 2" /></>,
+  habit: <><rect x="3" y="4" width="18" height="18" rx="3" /><path d="M16 2v4M8 2v4M3 10h18M8 15l2.5 2.5L16 13" /></>,
+  health: <><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21.2l8.8-8.8a5.5 5.5 0 0 0 0-7.8z" /><path d="M3.5 12h4l2-3 3 6 2-3h6" /></>,
+  coach: <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8" /></>,
+  nutrition: <><path d="M12 7c-1.5-2.5-6-2.6-7 1.5-1 4 1.5 11.5 5 12.5 1 .3 1.5-.5 2-.5s1 .8 2 .5c3.5-1 6-8.5 5-12.5-1-4.1-5.5-4-7-1.5z" /><path d="M12 7c0-2 1-4 3-5" /></>,
+};
 
 const BUILD_CARDS = [
-  { title: 'Body Transformation',      desc: 'Build muscle, lose fat, become stronger, move with less pain, and improve performance.',                               icon: <img src={iconBody}      alt="" /> },
-  { title: 'Mindset & Confidence',     desc: 'Develop confidence, resilience, discipline, and a healthier relationship with exercise.',                             icon: <img src={iconMindset}   alt="" /> },
-  { title: 'Lifestyle & Habits',       desc: 'Create routines that fit your life and make consistency feel achievable.',                                            icon: <img src={iconLifestyle} alt="" /> },
-  { title: 'Health & Longevity',       desc: 'Increase energy, build resilience, reduce injury risk, and support your long-term health.',                          icon: <img src={iconHealth}    alt="" /> },
-  { title: 'Coaching & Accountability',desc: 'Stay focused, supported, and accountable through every stage of your journey.',                                       icon: <img src={iconCoaching}  alt="" /> },
-  { title: 'Nutrition & Recovery',     desc: 'Build sustainable nutrition and recovery habits that support your goals without taking over your life.',               icon: <img src={iconNutrition} alt="" /> },
+  { icon: 'body',      title: 'Body Transformation',       desc: 'Build muscle, lose fat, become stronger, move with less pain, and improve performance.' },
+  { icon: 'mind',      title: 'Mindset & Confidence',      desc: 'Develop confidence, resilience, discipline, and a healthier relationship with exercise.' },
+  { icon: 'habit',     title: 'Lifestyle & Habits',        desc: 'Create routines that fit your life and make consistency feel achievable.' },
+  { icon: 'health',    title: 'Health & Longevity',        desc: 'Increase energy, build resilience, reduce injury risk, and support your long-term health.' },
+  { icon: 'coach',     title: 'Coaching & Accountability', desc: 'Stay focused, supported, and accountable through every stage of your journey.' },
+  { icon: 'nutrition', title: 'Nutrition & Recovery',      desc: 'Build sustainable nutrition and recovery habits that support your goals without taking over your life.' },
 ];
 
 const COACHING_STEPS = [
@@ -30,6 +33,9 @@ const COACHING_STEPS = [
   'Implement, Adjust & Progress',
   'Build Results That Last',
 ];
+
+const COMMON_FEATURES = ['Personalized Workout Program', 'Personalized Program Adjustments', null, 'Progress & Habit Tracking', 'Nutrition Guidelines & Resources', 'Exercise Library & Form Checks'];
+const EXTRA_FEATURES = ['Personalized Nutrition Coaching', 'Lifestyle & Mindset Coaching', 'Accountability Coaching'];
 
 const DEGREES = [
   { label: "Master's in Sport & Exercise Psychology", sub: 'West Chester University' },
@@ -53,66 +59,29 @@ const EXPERIENCE_ITEMS = [
   { label: 'Group & Semi-Private Coach',              sub: null },
 ];
 
-function AnimatedSection({ className, children }) {
-  const [ref, inView] = useInView();
+function PlanFeatures({ calls, featured }) {
+  const items = [
+    ...COMMON_FEATURES.map((f) => ({ text: f || calls, kind: 'yes' })),
+    ...EXTRA_FEATURES.map((f) => ({ text: f, kind: featured ? 'excl' : 'no' })),
+  ];
   return (
-    <section
-      ref={ref}
-      className={`${className} animate-fade-in-up ${inView ? 'in-view' : ''}`}
-    >
-      {children}
-    </section>
+    <ul className="checks">
+      {items.map(({ text, kind }) => (
+        <li key={text} className={kind === 'yes' ? undefined : kind}>
+          {kind === 'no' ? <XMark /> : <Check />}{text}
+        </li>
+      ))}
+    </ul>
   );
 }
 
+const toTop = () => window.scrollTo({ top: 0, behavior: 'instant' });
 
 export default function Home() {
   const [heroPhoto, setHeroPhoto]           = useState(() => localStorage.getItem(PHOTO_CACHE_KEY)       || '');
   const [heroVideo, setHeroVideo]           = useState(() => localStorage.getItem(VIDEO_CACHE_KEY)       || '');
   const [heroVideoError, setHeroVideoError] = useState(false);
   const [focusPhoto, setFocusPhoto]         = useState(() => localStorage.getItem(FOCUS_PHOTO_CACHE_KEY) || '');
-  const [scrolledPastHero, setScrolledPastHero] = useState(false);
-
-  const heroMediaRef  = useRef(null);
-  const focusMediaRef = useRef(null);
-  const focusLagRef   = useRef(null);
-  const [focusTextRef, focusTextInView] = useInView();
-
-  useEffect(() => {
-    const allowParallax = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      && window.innerWidth >= 768;
-
-    let rafId = null;
-    const handleScroll = () => {
-      if (rafId) return;
-      rafId = requestAnimationFrame(() => {
-        if (allowParallax) {
-          if (heroMediaRef.current) {
-            const rect = heroMediaRef.current.getBoundingClientRect();
-            heroMediaRef.current.style.transform = `translateY(${-rect.top * 0.5}px)`;
-          }
-          if (focusMediaRef.current) {
-            const rect = focusMediaRef.current.getBoundingClientRect();
-            focusMediaRef.current.style.transform = `translateY(${-rect.top * 0.3}px)`;
-          }
-          if (focusLagRef.current) {
-            const rect = focusLagRef.current.getBoundingClientRect();
-            const progress = Math.min(Math.max((window.innerHeight - rect.top) / window.innerHeight, 0), 1);
-            focusLagRef.current.style.transform = `translateY(${progress * 60}px)`;
-            focusLagRef.current.style.opacity = 0.7 + progress * 0.3;
-          }
-        }
-        setScrolledPastHero(window.scrollY > 100);
-        rafId = null;
-      });
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, []);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/content`)
@@ -131,279 +100,207 @@ export default function Home() {
           setFocusPhoto(data['home.focusPhoto']);
           localStorage.setItem(FOCUS_PHOTO_CACHE_KEY, data['home.focusPhoto']);
         }
-
       })
       .catch(() => {});
   }, []);
 
   return (
-    <main className="home">
+    <main className="rd page">
 
-      {/* ── Section 1: Hero ────────────────────────────────────── */}
+      {/* 1 · Hero */}
       <section className="hero">
-        <div className="hero-media" ref={heroMediaRef}>
+        <div className="hero-media" aria-hidden="true">
           {heroVideo && !heroVideoError ? (
             <video
-              className="hero-video"
               src={heroVideo}
               poster={heroPhoto || undefined}
               autoPlay loop muted playsInline
               onError={() => setHeroVideoError(true)}
             />
-          ) : (
-            <div
-              className={`hero-media-fallback${heroPhoto ? ' hero-media-photo' : ''}`}
-              style={heroPhoto ? { backgroundImage: `url(${heroPhoto})` } : undefined}
-            >
-              {!heroPhoto && (
-                <>
-                  <span className="hero-media-mark">A1</span>
-                  <div className="hero-media-stripes" />
-                </>
-              )}
-            </div>
-          )}
-          <div className="hero-overlay" />
-          <div className="hero-grid-overlay" aria-hidden="true" />
+          ) : heroPhoto ? (
+            <div className="hero-photo" style={{ backgroundImage: `url(${heroPhoto})` }} />
+          ) : null}
         </div>
-
-        <div className="hero-content">
-          <h1 className="hero-title">
-            <span>Transform Your Body.</span>
-            <span>Strengthen Your Mind.</span>
-            <span>Build a Healthier Life.</span>
-          </h1>
-          <p className="hero-sub">
-            Personalized coaching that combines fitness, nutrition, psychology, accountability, and longevity to help you build lasting habits and become the healthiest version of yourself.
-          </p>
-          <div className="hero-cta-wrap">
-            <Link to="/booking" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-              <button className="cta-button">Book a Free Consultation</button>
-            </Link>
-            <Link to="/about" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
-              <button className="cta-button-outline">Learn More</button>
-            </Link>
+        <div className="hero-grid" aria-hidden="true" />
+        <div className="hero-beam" aria-hidden="true" />
+        {!heroVideo && !heroPhoto && <img className="hero-mark" src={logo} alt="" aria-hidden="true" />}
+        <div className="hero-shade" aria-hidden="true" />
+        <div className="hero-content solo">
+          <div>
+            <h1 className="hero-title">
+              <span className="line"><span>Transform Your Body.</span></span>
+              <span className="line"><span>Strengthen Your Mind.</span></span>
+              <span className="line"><span className="gold-text">Build a Healthier Life.</span></span>
+            </h1>
+            <p className="hero-sub">
+              Personalized coaching that combines fitness, nutrition, psychology, accountability, and longevity to help you build lasting habits and become the healthiest version of yourself.
+            </p>
+            <div className="hero-ctas">
+              <Link to="/booking" className="btn btn-gold btn-lg" onClick={toTop}>Book a Free Consultation<Arrow /></Link>
+              <Link to="/about" className="btn btn-ghost btn-lg" onClick={toTop}>Learn More</Link>
+            </div>
           </div>
         </div>
-
-        <div
-          className={`hero-scroll-indicator ${scrolledPastHero ? 'hero-scroll-indicator-hidden' : ''}`}
-          aria-hidden="true"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </div>
+        <div className="scroll-cue" aria-hidden="true"><span className="mouse"><i /></span></div>
       </section>
 
       {/* Trust strip */}
-      <div className="trust-strip">
-        <span className="trust-strip-kicker">Professional Background</span>
-        <div className="trust-strip-row">
-          <span>Life Time Inc.</span>
-          <span className="trust-strip-divider" aria-hidden="true" />
-          <span>Philadelphia Union</span>
-          <span className="trust-strip-divider" aria-hidden="true" />
+      <div className="trust">
+        <span className="trust-kicker">Professional Background</span>
+        <div className="trust-row">
+          <span>Life Time Inc.</span><i className="diamond" aria-hidden="true" />
+          <span>Philadelphia Union</span><i className="diamond" aria-hidden="true" />
           <span>West Chester University</span>
         </div>
       </div>
 
-      {/* ── Section 2: Why All In One? ─────────────────────────── */}
-      <AnimatedSection className="why-aio">
-        <div className="why-aio-inner">
-          <h2>Why 'All-In-One?'</h2>
-          <p>Health isn't built by workouts alone.</p>
-          <p>Real transformation happens when fitness, nutrition, mindset, accountability, recovery, and lifestyle all work together. That's why I created All-In-One Fitness.</p>
-          <p>My coaching isn't about giving you another workout plan. It's about helping you build a lifestyle that keeps you healthy, consistent, strong, and excited to train, all while achieving your dream body and maintaining it for life.</p>
-          <p className="why-aio-tagline">Build the body you want, and keep it for life.</p>
+      {/* 2 · Why All-In-One */}
+      <section className="section">
+        <div className="why-center reveal">
+          <h2 className="display">Why &apos;<span className="gold-text">All-In-One?</span>&apos;</h2>
+          <p className="lead">Health isn&apos;t built by workouts alone.</p>
+          <p className="body">Real transformation happens when fitness, nutrition, mindset, accountability, recovery, and lifestyle all work together. That&apos;s why I created All-In-One Fitness.</p>
+          <p className="body">My coaching isn&apos;t about giving you another workout plan. It&apos;s about helping you build a lifestyle that keeps you healthy, consistent, strong, and excited to train, all while achieving your dream body and maintaining it for life.</p>
+          <p className="why-tagline gold-text">Build the body you want, and keep it for life.</p>
         </div>
-      </AnimatedSection>
+      </section>
 
-      {/* ── Section 3: What We Build Together ─────────────────── */}
-      <AnimatedSection className="what-we-build">
-        <div className="section-inner">
-          <h2 className="section-heading">What We Build Together</h2>
-          <div className="build-grid">
-            {BUILD_CARDS.map(({ title, desc, icon }) => (
-              <div key={title} className="build-card">
-                <span className="build-icon" aria-hidden="true">{icon}</span>
+      {/* 3 · What We Build Together */}
+      <section className="section alt lined">
+        <div className="wrap">
+          <div className="head head-center reveal">
+            <h2 className="display">What We Build <span className="gold-text">Together</span></h2>
+          </div>
+          <div className="build-grid reveal-stagger">
+            {BUILD_CARDS.map(({ icon, title, desc }, i) => (
+              <article key={title} className="bcard" onMouseMove={spotlight}>
+                <span className="bghost" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                <div className="bcard-top">
+                  <span className="bicon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{ICONS[icon]}</svg>
+                  </span>
+                </div>
                 <h3>{title}</h3>
                 <p>{desc}</p>
-              </div>
+              </article>
             ))}
           </div>
         </div>
-      </AnimatedSection>
+      </section>
 
-      {/* ── Section 4: How Coaching Works ─────────────────────── */}
-      <AnimatedSection className="how-it-works">
-        <div className="section-inner">
-          <h2 className="section-heading">How Coaching Works</h2>
-          <div className="steps-timeline">
+      {/* 4 · How Coaching Works + plans */}
+      <section className="section lined">
+        <div className="wrap">
+          <div className="head head-center reveal">
+            <h2 className="display">How Coaching <span className="gold-text">Works</span></h2>
+          </div>
+          <div className="steps plain reveal">
+            <div className="track" aria-hidden="true"><span className="track-fill" /><span className="track-spark" /></div>
             {COACHING_STEPS.map((label, i) => (
-              <div key={i} className="step">
-                <div className="step-circle">{i + 1}</div>
-                <p className="step-label">{label}</p>
+              <div key={label} className="step">
+                <span className="step-node" style={{ '--i': i }}>{i + 1}</span>
+                <div className="step-card"><b>{label}</b></div>
               </div>
             ))}
           </div>
-          <div className="plan-split-label">
-            <span className="plan-split-eyebrow">CHOOSE YOUR LEVEL OF SUPPORT</span>
-            <p className="plan-split-tagline">Your roadmap is personalized. The level of support is up to you.</p>
+          <div className="plan-split reveal">
+            <span className="kicker">Choose Your Level of Support</span>
+            <p>Your roadmap is personalized. The level of support is up to you.</p>
           </div>
-          <div className="plan-cards">
-            <div className="plan-card">
-              <span className="plan-card-eyebrow">PERSONALIZED PROGRAMMING</span>
-              <h3 className="plan-card-name">Programming+</h3>
-              <div className="plan-card-divider" />
-              <ul className="plan-card-features">
-                <li className="feat-yes">Personalized Workout Program</li>
-                <li className="feat-yes">Personalized Program Adjustments</li>
-                <li className="feat-yes">1 Coaching Call/Month (30 min)</li>
-                <li className="feat-yes">Progress &amp; Habit Tracking</li>
-                <li className="feat-yes">Nutrition Guidelines &amp; Resources</li>
-                <li className="feat-yes">Exercise Library &amp; Form Checks</li>
-                <li className="feat-no">Personalized Nutrition Coaching</li>
-                <li className="feat-no">Lifestyle &amp; Mindset Coaching</li>
-                <li className="feat-no">Accountability Coaching</li>
-              </ul>
-              <Link to="/coaching/apply?package=programming-plus" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
-                <button className="cta-button-outline">Get Started</button>
-              </Link>
-            </div>
-            <div className="plan-card plan-card--featured">
-              <span className="plan-card-eyebrow">COMPLETE COACHING</span>
-              <h3 className="plan-card-name">All-In-One Coaching</h3>
-              <div className="plan-card-divider" />
-              <ul className="plan-card-features">
-                <li className="feat-yes">Personalized Workout Program</li>
-                <li className="feat-yes">Personalized Program Adjustments</li>
-                <li className="feat-yes">2 Coaching Calls/Month (30 min each)</li>
-                <li className="feat-yes">Progress &amp; Habit Tracking</li>
-                <li className="feat-yes">Nutrition Guidelines &amp; Resources</li>
-                <li className="feat-yes">Exercise Library &amp; Form Checks</li>
-                <li className="feat-yes feat-exclusive">Personalized Nutrition Coaching</li>
-                <li className="feat-yes feat-exclusive">Lifestyle &amp; Mindset Coaching</li>
-                <li className="feat-yes feat-exclusive">Accountability Coaching</li>
-              </ul>
-              <Link to="/coaching/apply?package=aio-coaching" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
-                <button className="cta-button">Apply Now</button>
-              </Link>
-            </div>
+          <div className="plan-grid reveal-stagger">
+            <article className="price">
+              <span className="plan-eyebrow">Personalized Programming</span>
+              <h3 className="plan-name">Programming+</h3>
+              <div className="plan-divider" />
+              <PlanFeatures calls="1 Coaching Call/Month (30 min)" />
+              <Link to="/coaching/apply?package=programming-plus" className="btn btn-line btn-block" onClick={toTop}>Get Started</Link>
+            </article>
+            <article className="price featured">
+              <span className="plan-eyebrow">Complete Coaching</span>
+              <h3 className="plan-name gold-text">All-In-One Coaching</h3>
+              <div className="plan-divider" />
+              <PlanFeatures calls="2 Coaching Calls/Month (30 min each)" featured />
+              <Link to="/coaching/apply?package=aio-coaching" className="btn btn-gold btn-block" onClick={toTop}>Apply Now<Arrow /></Link>
+            </article>
           </div>
         </div>
-      </AnimatedSection>
+      </section>
 
-      {/* ── Section 5: Meet Everett ────────────────────────────── */}
-      <AnimatedSection className="focus-panel">
-        <div className="focus-panel-image">
-          <div className="focus-panel-media" ref={focusMediaRef}>
-            <div
-              className={`focus-panel-photo-layer${focusPhoto ? ' focus-panel-media-photo' : ''}`}
-              style={focusPhoto ? { backgroundImage: `url(${focusPhoto})` } : undefined}
-            >
-              {!focusPhoto && <div className="focus-panel-stripes" />}
-            </div>
-            <div className="focus-panel-cover" />
-          </div>
+      {/* 5 · Meet Everett */}
+      <section className="meet">
+        <div className={`meet-photo${focusPhoto ? ' has-photo' : ''}`}>
+          {focusPhoto ? (
+            <>
+              <img className="photo" src={focusPhoto} alt="Everett Lee" />
+              <div className="photo-shade" aria-hidden="true" />
+            </>
+          ) : (
+            <div className="stripes" aria-hidden="true" />
+          )}
+          <div className="curtain" aria-hidden="true" />
         </div>
-
-        <div
-          ref={focusTextRef}
-          className={`focus-panel-content animate-fade-in-left ${focusTextInView ? 'in-view' : ''}`}
-        >
-          <div className="focus-panel-content-lag" ref={focusLagRef}>
-            <span className="focus-panel-kicker">Meet Your Coach</span>
-            <h2>Meet Everett</h2>
-            <p className="focus-panel-lead">
-              I wasn't always confident in my body. Growing up, I was bullied because of how I looked and struggled with anorexia, graduating high school at just 105 pounds.
-            </p>
-            <p>
-              Strength training changed everything. Over the following years I gained more than 60 pounds, transformed my body, rebuilt my confidence, and discovered that fitness is about far more than appearance.
-            </p>
-            <p>
-              That journey inspired me to earn degrees in Exercise Science and Sport &amp; Exercise Psychology and dedicate my career to helping others experience the same transformation.
-            </p>
-            <Link to="/about" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })} className="focus-panel-link">
-              Full Story →
-            </Link>
-          </div>
+        <div className="meet-copy reveal">
+          <span className="kicker">Meet Your Coach</span>
+          <h2 className="display">Meet <span className="gold-text">Everett</span></h2>
+          <p className="lead">I wasn&apos;t always confident in my body. Growing up, I was bullied because of how I looked and struggled with anorexia, graduating high school at just 105 pounds.</p>
+          <p className="body">Strength training changed everything. Over the following years I gained more than 60 pounds, transformed my body, rebuilt my confidence, and discovered that fitness is about far more than appearance.</p>
+          <p className="body">That journey inspired me to earn degrees in Exercise Science and Sport &amp; Exercise Psychology and dedicate my career to helping others experience the same transformation.</p>
+          <div><Link to="/about" className="text-link" onClick={toTop}>Full Story<Arrow /></Link></div>
         </div>
-      </AnimatedSection>
+      </section>
 
-      {/* ── Section 8: Education & Experience ─────────────────── */}
-      <AnimatedSection className="edu-experience">
-        <div className="section-inner">
-          <h2 className="section-heading">Education &amp; Experience</h2>
-
-          {/* Hero stat — full width above columns */}
-          <div className="edu-stat-hero">
-            <span className="edu-stat-number">5,000+</span>
+      {/* 6 · Education & Experience */}
+      <section className="section">
+        <div className="wrap">
+          <div className="head head-center reveal">
+            <h2 className="display">Education &amp; <span className="gold-text">Experience</span></h2>
+          </div>
+          <div className="edu-stat reveal">
+            <span className="edu-stat-num gold-text">5,000+</span>
             <div className="edu-stat-text">
-              <span className="edu-stat-label">Professional Coaching Sessions Delivered</span>
-              <span className="edu-stat-sub">Across In-Person &amp; Online Coaching</span>
+              <b>Professional Coaching Sessions Delivered</b>
+              <span>Across In-Person &amp; Online Coaching</span>
             </div>
           </div>
-
-          <div className="edu-columns">
-
-            {/* Column 1 — Education */}
+          <div className="edu-cols reveal-stagger">
             <div className="edu-col">
-              <h3 className="edu-col-heading">Education</h3>
-              <div className="edu-degree-grid">
-                {DEGREES.map((d) => (
-                  <div className="edu-degree-card" key={d.label}>
-                    <span className="edu-type">DEGREE</span>
-                    <span className="edu-label">{d.label}</span>
-                    {d.sub && <span className="edu-sub">{d.sub}</span>}
-                  </div>
-                ))}
-              </div>
-              <p className="edu-focus-note">
-                <span className="edu-focus-label">ADDITIONAL ACADEMIC FOCUS</span> {EDU_FOCUS}
-              </p>
+              <h3>Education</h3>
+              {DEGREES.map((d) => (
+                <div className="degree" key={d.label}>
+                  <small>DEGREE</small><b>{d.label}</b>{d.sub && <span>{d.sub}</span>}
+                </div>
+              ))}
+              <p className="edu-focus"><b>ADDITIONAL ACADEMIC FOCUS</b>{EDU_FOCUS}</p>
             </div>
-
-            {/* Column 2 — Certifications */}
             <div className="edu-col">
-              <h3 className="edu-col-heading">Certifications</h3>
-              <ul className="edu-cert-list">
-                {CERTIFICATIONS.map((c) => (
-                  <li className="edu-cert-item" key={c}>
-                    <span className="edu-cert-check" aria-hidden="true">✓</span>
-                    {c}
-                  </li>
-                ))}
+              <h3>Certifications</h3>
+              <ul className="certs">
+                {CERTIFICATIONS.map((c) => <li key={c}><Check />{c}</li>)}
               </ul>
             </div>
-
-            {/* Column 3 — Coaching Experience */}
             <div className="edu-col">
-              <h3 className="edu-col-heading">Coaching Experience</h3>
-              <ol className="edu-timeline">
+              <h3>Coaching Experience</h3>
+              <ol className="timeline">
                 {EXPERIENCE_ITEMS.map((e) => (
-                  <li className="edu-timeline-item" key={e.label}>
-                    <span className="edu-timeline-dot" aria-hidden="true" />
-                    <div className="edu-timeline-body">
-                      <span className="edu-timeline-role">{e.label}</span>
-                      {e.sub && <span className="edu-timeline-org">{e.sub}</span>}
-                    </div>
-                  </li>
+                  <li key={e.label}><b>{e.label}</b>{e.sub && <span>{e.sub}</span>}</li>
                 ))}
               </ol>
             </div>
-
           </div>
         </div>
-      </AnimatedSection>
+      </section>
 
-      {/* ── Section 9: Final CTA ──────────────────────────────── */}
-      <AnimatedSection className="home-cta">
-        <h2>Ready to Become the Strongest Version of Yourself?</h2>
-        <Link to="/booking" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <button className="cta-button">Book a Free Consultation</button>
-        </Link>
-      </AnimatedSection>
+      {/* 7 · Final CTA */}
+      <section className="final">
+        <div className="final-glow" aria-hidden="true" />
+        <div className="final-rings" aria-hidden="true"><i /><i /><i /></div>
+        <h2 className="reveal">Ready to Become the <span className="gold-text">Strongest Version</span> of Yourself?</h2>
+        <div className="final-ctas reveal">
+          <Link to="/booking" className="btn btn-gold btn-lg" onClick={toTop}>
+            <span className="pulse-dot" aria-hidden="true" />Book a Free Consultation<Arrow />
+          </Link>
+        </div>
+      </section>
 
     </main>
   );

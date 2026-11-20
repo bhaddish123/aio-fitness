@@ -68,7 +68,7 @@ export default function Dashboard() {
                 <td>{booking.clientName}</td>
                 <td>{booking.sessionType?.name}</td>
                 <td>{new Date(booking.startTime).toLocaleString()}</td>
-                <td>{booking.status}</td>
+                <td><span className={`status-pill status-${booking.status}`}>{booking.status}</span></td>
               </tr>
             ))}
           </tbody>
