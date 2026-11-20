@@ -1,0 +1,81 @@
+name: CI
+
+# Runs checks only — no deploys and no real secrets.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend (lint + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      # Report-only for now: the existing code has lint errors to clean up first.
+      - name: Lint (report only)
+        run: npm run lint
+        continue-on-error: true
+      - name: Build
+        run: npm run build
+
+  backend:
+    name: Backend (tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/aio-fitness-backend
+    # Throwaway database for this run only — never touches the real RDS.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: aio_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    # Placeholder values so the app can start in tests. None of these are real.
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/aio_test
+      SPRING_DATASOURCE_USERNAME: ci
+      SPRING_DATASOURCE_PASSWORD: ci
+      MAIL_USERNAME: ci@example.com
+      MAIL_PASSWORD: ci-placeholder
+      STRIPE_API_KEY: sk_test_placeholder
+      JWT_SECRET: ci-placeholder-not-a-real-secret-0123456789abcdef0123456789abcdef
+      ADMIN_USERNAME: ci
+      ADMIN_PASSWORD: ci-placeholder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: Run tests
+        run: |
+          chmod +x mvnw
+          ./mvnw -B test
