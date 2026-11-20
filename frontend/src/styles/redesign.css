@@ -122,7 +122,7 @@
 .rd .to-top:hover svg { transform: translateY(-3px); }
 
 /* ---------- Hero ---------- */
-.rd .hero { position: relative; min-height: clamp(640px, 100svh, 900px); display: flex; align-items: flex-end; overflow: hidden; isolation: isolate; padding: 170px clamp(20px, 6vw, 96px) 128px; border-bottom: 1px solid rgba(212, 175, 55, 0.35); }
+.rd .hero { position: relative; min-height: clamp(560px, calc(100svh - 187px), 900px); display: flex; align-items: flex-end; overflow: hidden; isolation: isolate; padding: 140px clamp(20px, 6vw, 96px) 96px; border-bottom: 1px solid rgba(212, 175, 55, 0.35); }
 .rd .hero-media { position: absolute; inset: -4%; z-index: -3; background: radial-gradient(ellipse 60% 70% at 72% 32%, #3a301a 0%, #1a160e 42%, #0b0a08 78%); animation: kenburns 20s ease-in-out infinite alternate; }
 .rd .hero-grid { position: absolute; inset: 0; z-index: -2; background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px); background-size: 76px 76px; -webkit-mask-image: radial-gradient(ellipse 70% 60% at 65% 40%, #000 15%, transparent 75%); mask-image: radial-gradient(ellipse 70% 60% at 65% 40%, #000 15%, transparent 75%); animation: gridDrift 30s linear infinite; }
 .rd .hero-beam { position: absolute; inset: -30% -10%; z-index: -2; background: linear-gradient(112deg, transparent 40%, rgba(249, 225, 128, 0.11) 49%, rgba(249, 225, 128, 0.04) 52%, transparent 60%); animation: beam 9s var(--ease) infinite; }
