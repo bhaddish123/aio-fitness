@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { API_BASE_URL } from '../utils/constants';
-import { useInView } from '../hooks/useInView';
+import { Link } from 'react-router-dom';
+import { Arrow } from '../components/RedesignBits';
 
 const DEFAULT_FAQ_ITEMS = [
   {
@@ -60,36 +61,25 @@ const DEFAULT_FAQ_ITEMS = [
   },
 ];
 
-function FaqItem({ question, answer }) {
-  const [open, setOpen] = useState(false);
+function FaqItem({ n, question, answer, defaultOpen }) {
+  const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="faq-item">
-      <button className="faq-question" onClick={() => setOpen(!open)} aria-expanded={open}>
-        <span>{question}</span>
-        <span>{open ? '−' : '+'}</span>
+    <div className={`qa${open ? ' is-open' : ''}`}>
+      <button type="button" className="qa-btn" onClick={() => setOpen(!open)} aria-expanded={open}>
+        <span className="qn">{String(n).padStart(2, '0')}</span>
+        <span className="qt">{question}</span>
+        <span className="plus" aria-hidden="true" />
       </button>
-      <div className={`faq-body ${open ? 'faq-body-open' : ''}`}>
-        <div className="faq-body-inner">
-          <div className="faq-answer">
-            <p>{answer}</p>
-          </div>
-        </div>
-      </div>
+      {open && <p className="qa-a">{answer}</p>}
     </div>
   );
 }
 
 export default function FAQ() {
-  // Always start from the current code's defaults — they render
-  // instantly and are always correct. A stale localStorage cache (from
-  // before content changes, or an admin's previous edits) used to be
-  // read here first, causing a visible flash from old cached content
-  // to the real defaults once the fetch below confirmed there was no
-  // override. Only a genuine admin-set override should ever replace
-  // what's shown, and only once the fetch actually finds one.
+  // Always start from the current code's defaults; only a genuine
+  // admin-set override from the content API replaces them.
   const [faqItems, setFaqItems] = useState(DEFAULT_FAQ_ITEMS);
-  const [headingRef, headingInView] = useInView();
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/content`)
@@ -101,21 +91,40 @@ export default function FAQ() {
             if (parsed.length) {
               setFaqItems(parsed);
             }
-          } catch {}
+          } catch {
+            // Bad JSON from the admin field — keep the defaults.
+          }
         }
       })
       .catch(() => {});
   }, []);
 
   return (
-    <main className="faq-page">
-      <h1 ref={headingRef} className={`animate-fade-in-up${headingInView ? ' in-view' : ''}`}>Frequently Asked <span>Questions</span></h1>
-      <div className="faq-list">
-        {faqItems && faqItems.map((item, index) => (
-          <FaqItem key={index} question={item.question} answer={item.answer} />
-        ))}
-      </div>
+    <main className="rd page">
+      <section className="page-hero center" style={{ textAlign: 'center', paddingBottom: 80 }}>
+        <div className="glow-top" aria-hidden="true" />
+        <div className="hero-grid" aria-hidden="true" />
+        <h1>
+          <span className="line"><span>Frequently Asked</span></span>
+          <span className="line"><span className="gold-text">Questions</span></span>
+        </h1>
+      </section>
 
+      <section className="section" style={{ paddingTop: 72 }}>
+        <div className="faq-col">
+          <div className="faq-tools reveal">
+            <span>{faqItems.length} questions</span>
+            <Link to="/booking" className="text-link" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+              Book a Free Consultation<Arrow />
+            </Link>
+          </div>
+          <div className="reveal-stagger">
+            {faqItems.map((item, index) => (
+              <FaqItem key={item.id || index} n={index + 1} question={item.question} answer={item.answer} defaultOpen={index === 0} />
+            ))}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

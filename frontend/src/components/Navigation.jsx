@@ -3,147 +3,92 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import logo from '../assets/A1_logo_transparent.png';
 
+const LINKS = [
+  { to: '/', label: 'Home' },
+  { to: '/about', label: 'About' },
+  { to: '/coaching', label: 'Coaching' },
+  { to: '/results', label: 'Results' },
+  { to: '/faq', label: 'FAQ' },
+];
+
 export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(window.scrollY > 60);
   const { pathname } = useLocation();
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
-  // Transparent over the hero at the top of the page, solid backdrop
-  // once scrolled past it — avoids the nav text colliding with page
-  // content that scrolls underneath a permanently transparent nav.
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 60);
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [pathname]);
-
-  // Dragging the window across the mobile breakpoint changes the dropdown's
-  // computed max-height, which would otherwise animate and flash the closed
-  // menu's first item over the page. Suppress that transition while resizing.
-  useEffect(() => {
-    let resizeTimer;
-    const handleResize = () => {
-      document.documentElement.classList.add('nav-resizing');
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        document.documentElement.classList.remove('nav-resizing');
-      }, 150);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(resizeTimer);
-    };
-  }, []);
+  // Close the mobile menu whenever the route changes.
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   const handleNav = (to) => {
     setMenuOpen(false);
-    if (pathname === to) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    }
+    window.scrollTo({ top: 0, behavior: pathname === to ? 'smooth' : 'instant' });
   };
 
   const handleLogout = () => {
+    setMenuOpen(false);
     logout();
     navigate('/');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
-  const isActive = (to) => pathname === to;
+  const links = isAuthenticated
+    ? [...LINKS, { to: '/admin/dashboard', label: 'Dashboard' }]
+    : LINKS;
 
   return (
-    <header className={`nav-header ${scrolled ? 'nav-header-scrolled' : ''}`}>
-      <nav className="nav-container">
-
-        {/* Left group — brand + primary links sit together, no central void */}
-        <div className="nav-left-group">
-          <div className="nav-brand">
-            <Link to="/" className="nav-brand-link" aria-label="AIO Fitness — Home" onClick={() => handleNav('/')}>
-              <span className="nav-logo-badge">
-                <span
-                  className="nav-logo-icon"
-                  role="img"
-                  aria-hidden="true"
-                  style={{ backgroundImage: `url(${logo})` }}
-                />
-              </span>
-              <span className="nav-wordmark">
-                <span className="nav-wordmark-line1">All In One</span>
-                <span className="nav-wordmark-line2">Fitness</span>
-              </span>
-            </Link>
-          </div>
-
-          <div className={`nav-links ${menuOpen ? 'nav-links-open' : ''}`}>
-            <Link
-              to="/"
-              aria-current={isActive('/') ? 'page' : undefined}
-              onClick={() => handleNav('/')}
-            >Home</Link>
-            <Link
-              to="/about"
-              aria-current={isActive('/about') ? 'page' : undefined}
-              onClick={() => handleNav('/about')}
-            >About</Link>
-            <Link
-              to="/coaching"
-              aria-current={isActive('/coaching') ? 'page' : undefined}
-              onClick={() => handleNav('/coaching')}
-            >Coaching</Link>
-            <Link
-              to="/results"
-              aria-current={isActive('/results') ? 'page' : undefined}
-              onClick={() => handleNav('/results')}
-            >Results</Link>
-            <Link
-              to="/faq"
-              aria-current={isActive('/faq') ? 'page' : undefined}
-              onClick={() => handleNav('/faq')}
-            >FAQ</Link>
-            {isAuthenticated && (
-              <Link
-                to="/admin/dashboard"
-                aria-current={isActive('/admin/dashboard') ? 'page' : undefined}
-                onClick={() => handleNav('/admin/dashboard')}
-              >Dashboard</Link>
-            )}
-            {isAuthenticated && (
-              <button className="nav-logout-btn" onClick={handleLogout}>
-                LOGOUT
-              </button>
-            )}
-            {/* Shown only in mobile dropdown */}
-            <Link
-              to="/booking"
-              className="nav-links-mobile-cta"
-              onClick={() => handleNav('/booking')}
-            >Free Consultation</Link>
-          </div>
-        </div>
-
-        {/* Right — isolated CTA focal point + hamburger */}
-        <div className="nav-right">
-          <Link to="/booking" className="nav-cta" onClick={() => handleNav('/booking')}>
-            Free Consultation
+    <div className="rd">
+      <div className="progress" aria-hidden="true" />
+      <header className="nav">
+        <div className="nav-inner">
+          <Link to="/" className="brand" aria-label="All In One Fitness — Home" onClick={() => handleNav('/')}>
+            <span className="mark round"><img src={logo} alt="" /></span>
+            <span className="wordmark"><b>All In One</b><span>Fitness</span></span>
           </Link>
-          <button
-            className={`nav-hamburger ${menuOpen ? 'open' : ''}`}
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-            aria-expanded={menuOpen}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-        </div>
 
-      </nav>
-    </header>
+          <nav className="nav-links" aria-label="Primary">
+            {links.map(({ to, label }) => (
+              <Link key={to} to={to} aria-current={pathname === to ? 'page' : undefined} onClick={() => handleNav(to)}>
+                {label}
+              </Link>
+            ))}
+            {isAuthenticated && (
+              <button type="button" className="nav-logout" onClick={handleLogout}>Logout</button>
+            )}
+          </nav>
+
+          <div className="nav-right">
+            <Link to="/booking" className="btn btn-gold nav-cta" onClick={() => handleNav('/booking')}>
+              <span className="pulse-dot" aria-hidden="true" />Free Consultation
+            </Link>
+            <button
+              type="button"
+              className="menu-btn"
+              aria-label="Toggle menu"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((o) => !o)}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                {menuOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 8h16M4 16h16" />}
+              </svg>
+            </button>
+          </div>
+
+          {menuOpen && (
+            <div className="mobile-menu">
+              {links.map(({ to, label }) => (
+                <Link key={to} to={to} onClick={() => handleNav(to)}>{label}</Link>
+              ))}
+              {isAuthenticated && (
+                <button type="button" className="nav-logout" onClick={handleLogout}>Logout</button>
+              )}
+              <Link to="/booking" className="btn btn-gold btn-block" onClick={() => handleNav('/booking')}>
+                Free Consultation
+              </Link>
+            </div>
+          )}
+        </div>
+      </header>
+    </div>
   );
 }
