@@ -370,7 +370,7 @@
 .rd .glow-top { position: absolute; left: 50%; top: -420px; width: 1000px; height: 700px; margin-left: -500px; z-index: -1; border-radius: 50%; background: radial-gradient(ellipse, rgba(212, 175, 55, 0.2), transparent 65%); animation: breathe 8s ease-in-out infinite; }
 
 /* About */
-.rd .split-hero { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(560px, 100%), 1fr)); min-height: 860px; padding-top: 118px; border-bottom: 1px solid var(--line); }
+.rd .split-hero { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(560px, 100%), 1fr)); min-height: 860px; padding-top: 26px; border-bottom: 1px solid var(--line); }
 .rd .split-hero .meet-photo { min-height: 0; align-self: stretch; }
 .rd .split-copy { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: center; gap: 24px; padding: 180px clamp(24px, 6vw, 96px) 96px; }
 .rd .split-copy h1 { font: 400 clamp(64px, 8vw, 128px)/0.88 var(--display); text-transform: uppercase; }
