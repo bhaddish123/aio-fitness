@@ -360,13 +360,14 @@
 .rd .footer-row p { font: 500 12px/1.5 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
 
 /* ---------- Inner page heroes ---------- */
-.rd .page-hero { position: relative; overflow: hidden; isolation: isolate; padding: 210px clamp(20px, 6vw, 96px) 110px; border-bottom: 1px solid var(--line); }
+.rd .page-hero { position: relative; overflow: hidden; isolation: isolate; padding: 130px clamp(20px, 6vw, 96px) 40px; border-bottom: 1px solid var(--line); }
 .rd .page-hero .hero-grid { -webkit-mask-image: radial-gradient(ellipse 60% 80% at 50% 0%, #000 10%, transparent 70%); mask-image: radial-gradient(ellipse 60% 80% at 50% 0%, #000 10%, transparent 70%); }
-.rd .page-hero h1 { font: 400 clamp(60px, 9vw, 140px)/0.9 var(--display); text-transform: uppercase; margin-top: 24px; }
+.rd .page-hero h1 { font: 400 clamp(56px, 6.5vw, 96px)/0.9 var(--display); text-transform: uppercase; margin-top: 24px; }
 .rd .page-hero h1 .line > span { animation-delay: 0.15s; }
 .rd .page-hero .hero-sub { margin-left: auto; margin-right: auto; }
 .rd .page-hero.center .hero-sub { text-align: center; }
 .rd .page-hero .kicker { animation: rise 1s var(--ease) both; }
+.rd .page-hero + .section { padding-top: 56px; }
 .rd .glow-top { position: absolute; left: 50%; top: -420px; width: 1000px; height: 700px; margin-left: -500px; z-index: -1; border-radius: 50%; background: radial-gradient(ellipse, rgba(212, 175, 55, 0.2), transparent 65%); animation: breathe 8s ease-in-out infinite; }
 
 /* About */
