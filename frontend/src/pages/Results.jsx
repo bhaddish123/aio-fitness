@@ -37,14 +37,13 @@ export default function Results() {
 
   return (
     <main className="rd page">
-      <section className="page-hero center" style={{ textAlign: 'center', paddingBottom: 80 }}>
+      <section className="page-hero center compact" style={{ textAlign: 'center' }}>
         <div className="glow-top" aria-hidden="true" />
         <div className="hero-grid" aria-hidden="true" />
         <h1><span className="line"><span>Client <span className="gold-text">Results</span></span></span></h1>
-        <p className="hero-sub">Real transformations. Real people. Real results.</p>
       </section>
 
-      <section className="section" style={{ paddingTop: 72 }}>
+      <section className="section">
         {transformations.length > 0 ? (
           <div className="wrap results reveal-stagger">
             {transformations.map((t) => (
