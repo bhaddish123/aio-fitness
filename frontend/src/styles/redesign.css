@@ -122,7 +122,7 @@
 .rd .to-top:hover svg { transform: translateY(-3px); }
 
 /* ---------- Hero ---------- */
-.rd .hero { position: relative; min-height: 900px; display: flex; align-items: flex-end; overflow: hidden; isolation: isolate; padding: 170px clamp(20px, 6vw, 96px) 128px; border-bottom: 1px solid rgba(212, 175, 55, 0.35); }
+.rd .hero { position: relative; min-height: clamp(640px, 100svh, 900px); display: flex; align-items: flex-end; overflow: hidden; isolation: isolate; padding: 170px clamp(20px, 6vw, 96px) 128px; border-bottom: 1px solid rgba(212, 175, 55, 0.35); }
 .rd .hero-media { position: absolute; inset: -4%; z-index: -3; background: radial-gradient(ellipse 60% 70% at 72% 32%, #3a301a 0%, #1a160e 42%, #0b0a08 78%); animation: kenburns 20s ease-in-out infinite alternate; }
 .rd .hero-grid { position: absolute; inset: 0; z-index: -2; background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px); background-size: 76px 76px; -webkit-mask-image: radial-gradient(ellipse 70% 60% at 65% 40%, #000 15%, transparent 75%); mask-image: radial-gradient(ellipse 70% 60% at 65% 40%, #000 15%, transparent 75%); animation: gridDrift 30s linear infinite; }
 .rd .hero-beam { position: absolute; inset: -30% -10%; z-index: -2; background: linear-gradient(112deg, transparent 40%, rgba(249, 225, 128, 0.11) 49%, rgba(249, 225, 128, 0.04) 52%, transparent 60%); animation: beam 9s var(--ease) infinite; }
@@ -370,8 +370,8 @@
 .rd .glow-top { position: absolute; left: 50%; top: -420px; width: 1000px; height: 700px; margin-left: -500px; z-index: -1; border-radius: 50%; background: radial-gradient(ellipse, rgba(212, 175, 55, 0.2), transparent 65%); animation: breathe 8s ease-in-out infinite; }
 
 /* About */
-.rd .split-hero { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(560px, 100%), 1fr)); min-height: 860px; border-bottom: 1px solid var(--line); }
-.rd .split-hero .meet-photo { min-height: 860px; }
+.rd .split-hero { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(560px, 100%), 1fr)); min-height: 860px; padding-top: 118px; border-bottom: 1px solid var(--line); }
+.rd .split-hero .meet-photo { min-height: 0; align-self: stretch; }
 .rd .split-copy { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: center; gap: 24px; padding: 180px clamp(24px, 6vw, 96px) 96px; }
 .rd .split-copy h1 { font: 400 clamp(64px, 8vw, 128px)/0.88 var(--display); text-transform: uppercase; }
 .rd .journey { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); gap: clamp(40px, 7vw, 110px); align-items: start; }
@@ -568,8 +568,8 @@
 }
 .rd .checks { align-content: start; }
 /* About hero: keep the photo clear of the floating nav */
-.rd .split-hero .meet-photo.has-photo .photo { inset: 118px 0 0 0; height: calc(100% - 118px); object-position: 50% 0%; transform: none; animation: none; }
-.rd .split-hero .meet-photo.has-photo .photo-shade { top: 118px; }
+.rd .split-hero .meet-photo.has-photo .photo { inset: 0; height: 100%; object-position: 50% 0%; transform: none; animation: none; }
+.rd .split-hero .meet-photo.has-photo .photo-shade { top: 0; }
 @media (max-width: 1080px) { .rd .split-hero .meet-photo { min-height: 0; height: 460px; } .rd .split-hero { min-height: 0; } .rd .split-hero .split-copy { padding-top: 56px; padding-bottom: 72px; } }
 
 
