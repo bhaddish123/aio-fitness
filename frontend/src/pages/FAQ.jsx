@@ -101,16 +101,15 @@ export default function FAQ() {
 
   return (
     <main className="rd page">
-      <section className="page-hero center" style={{ textAlign: 'center', paddingBottom: 80 }}>
+      <section className="page-hero center compact" style={{ textAlign: 'center' }}>
         <div className="glow-top" aria-hidden="true" />
         <div className="hero-grid" aria-hidden="true" />
         <h1>
-          <span className="line"><span>Frequently Asked</span></span>
-          <span className="line"><span className="gold-text">Questions</span></span>
+          <span className="line"><span>Frequently Asked <span className="gold-text">Questions</span></span></span>
         </h1>
       </section>
 
-      <section className="section" style={{ paddingTop: 72 }}>
+      <section className="section">
         <div className="faq-col">
           <div className="faq-tools reveal">
             <span>{faqItems.length} questions</span>

@@ -1,31 +1,22 @@
 import { Link } from 'react-router-dom';
-import { Check, XMark } from '../components/RedesignBits';
+import { Check } from '../components/RedesignBits';
 
 const TIERS = [
   {
-    id: 'aio-coaching',
-    badge: 'Most Popular',
-    name: 'All-In-One Coaching',
-    tagline: 'For clients who want to go further with ongoing coaching across training, nutrition, mindset, recovery, lifestyle, and accountability.',
+    id: 'consultation',
+    badge: null,
+    name: 'Free Consultation',
+    tagline: 'Not sure where to start? Book a complimentary call to talk through your goals and see if coaching is the right fit.',
     includes: [
-      { text: 'Full All-In-One Fitness App Access',                            yes: true },
-      { text: 'Personalized Workout Program',                                  yes: true },
-      { text: 'Personalized Program Adjustments',                              yes: true },
-      { text: '2 Coaching Calls/Month (30 min each)',                          yes: true },
-      { text: 'Progress Tracking',                                             yes: true },
-      { text: 'Habit Tracking',                                                yes: true },
-      { text: 'Private Client Community',                                      yes: true },
-      { text: 'Nutrition Guidelines & Resources',                              yes: true },
-      { text: 'Exercise, Program, Nutrition & Lifestyle Coaching Support',     yes: true },
-      { text: 'Exercise Video Library',                                        yes: true },
-      { text: 'Form Video Checks',                                             yes: true },
-      { text: 'Personalized Nutrition Coaching',                               yes: true, exclusive: true },
-      { text: 'Lifestyle & Mindset Coaching',                                  yes: true, exclusive: true },
-      { text: 'Accountability Coaching',                                       yes: true, exclusive: true },
+      '30-Minute Video or Phone Call',
+      'Goals & Lifestyle Assessment',
+      'Personalized Recommendations',
+      'No Payment Required',
+      'No Obligation to Continue',
     ],
-    cta: 'Apply Now',
-    ctaHref: '/coaching/apply?package=aio-coaching',
-    highlight: true,
+    cta: 'Book Free Consultation',
+    ctaHref: '/booking',
+    highlight: false,
   },
   {
     id: 'programming-plus',
@@ -33,40 +24,38 @@ const TIERS = [
     name: 'Programming+',
     tagline: 'For clients who want a personalized training plan, clear direction, and the structure to train more independently.',
     includes: [
-      { text: 'Full All-In-One Fitness App Access',                            yes: true },
-      { text: 'Personalized Workout Program',                                  yes: true },
-      { text: 'Personalized Program Adjustments',                              yes: true },
-      { text: '1 Coaching Call/Month (30 min)',                                yes: true },
-      { text: 'Progress Tracking',                                             yes: true },
-      { text: 'Habit Tracking',                                                yes: true },
-      { text: 'Private Client Community',                                      yes: true },
-      { text: 'Nutrition Guidelines & Resources',                              yes: true },
-      { text: 'Exercise & Program Coaching Support',                           yes: true },
-      { text: 'Exercise Video Library',                                        yes: true },
-      { text: 'Form Video Checks',                                             yes: true },
-      { text: 'Personalized Nutrition Coaching',                               yes: false },
-      { text: 'Lifestyle & Mindset Coaching',                                  yes: false },
-      { text: 'Accountability Coaching',                                       yes: false },
+      'Full All-In-One Fitness App Access',
+      'Personalized Workout Program',
+      'Personalized Program Adjustments',
+      '1 Coaching Call/Month (30 min)',
+      'Progress Tracking',
+      'Habit Tracking',
+      'Private Client Community',
+      'Nutrition Guidelines & Resources',
+      'Exercise & Program Coaching Support',
+      'Exercise Video Library',
+      'Form Video Checks',
     ],
     cta: 'Get Started',
     ctaHref: '/coaching/apply?package=programming-plus',
     highlight: false,
   },
   {
-    id: 'consultation',
-    badge: null,
-    name: 'Free Consultation',
-    tagline: 'Not sure where to start? Book a complimentary call to talk through your goals and see if coaching is the right fit.',
+    id: 'aio-coaching',
+    badge: 'Most Popular',
+    name: 'All-In-One Coaching',
+    tagline: 'For clients who want to go further with ongoing coaching across training, nutrition, mindset, recovery, lifestyle, and accountability.',
+    plusLabel: 'Everything in Programming+, plus:',
     includes: [
-      { text: '30-Minute Video or Phone Call',      yes: true },
-      { text: 'Goals & Lifestyle Assessment',       yes: true },
-      { text: 'Personalized Recommendations',       yes: true },
-      { text: 'No Payment Required',                yes: true },
-      { text: 'No Obligation to Continue',          yes: true },
+      '2 Coaching Calls/Month (30 min each)',
+      'Nutrition & Lifestyle Coaching Support',
+      'Personalized Nutrition Coaching',
+      'Lifestyle & Mindset Coaching',
+      'Accountability Coaching',
     ],
-    cta: 'Book Free Consultation',
-    ctaHref: '/booking',
-    highlight: false,
+    cta: 'Apply Now',
+    ctaHref: '/coaching/apply?package=aio-coaching',
+    highlight: true,
   },
 ];
 
@@ -75,21 +64,15 @@ const toTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 export default function OnlineCoaching() {
   return (
     <main className="rd page">
-      <section className="page-hero center" style={{ textAlign: 'center' }}>
+      <section className="page-hero center compact" style={{ textAlign: 'center' }}>
         <div className="glow-top" aria-hidden="true" />
         <div className="hero-grid" aria-hidden="true" />
-        <span className="kicker">100% Remote</span>
-        <h1><span className="line"><span>Online <span className="gold-text">Coaching</span></span></span></h1>
-        <p className="hero-sub">
-          Science-backed, fully remote coaching designed to build strength, improve health, and create long-term sustainable results — regardless of where you train.
-        </p>
+        <span className="kicker">100% Remote · Online Coaching</span>
+        <h1><span className="line"><span>Coaching <span className="gold-text">Options</span></span></span></h1>
       </section>
 
       <section className="section alt" id="tiers">
         <div className="wrap">
-          <div className="head head-center reveal">
-            <h2 className="display">Coaching <span className="gold-text">Options</span></h2>
-          </div>
           <div className="price-grid three reveal-stagger" style={{ paddingTop: 16 }}>
             {TIERS.map((tier) => (
               <article key={tier.id} className={`price${tier.highlight ? ' featured' : ''}`}>
@@ -102,10 +85,11 @@ export default function OnlineCoaching() {
                 <h3 className={`plan-name${tier.highlight ? ' gold-text' : ''}`}>{tier.name}</h3>
                 <p className="tagline">{tier.tagline}</p>
                 <div className="plan-divider" />
+                {tier.plusLabel && <p className="plus-label">{tier.plusLabel}</p>}
                 <ul className="checks">
                   {tier.includes.map((item) => (
-                    <li key={item.text} className={item.exclusive ? 'excl' : item.yes ? undefined : 'no'}>
-                      {item.yes ? <Check /> : <XMark />}{item.text}
+                    <li key={item} className={tier.plusLabel ? 'excl' : undefined}>
+                      <Check />{item}
                     </li>
                   ))}
                 </ul>
