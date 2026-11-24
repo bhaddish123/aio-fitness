@@ -1,7 +1,8 @@
 name: CI
 
-# Runs checks on PRs and pushes. On a push to main that changes the backend,
-# deploys it to EC2 after the backend tests pass (frontend deploys via Vercel).
+# Runs checks on PRs and pushes. On a push to main, after the backend tests pass, asks EC2 to deploy
+# that exact commit; the server skips it if backend/ hasn't changed since its last successful deploy.
+# The frontend deploys via Vercel.
 on:
   pull_request:
     branches: [main]
@@ -88,24 +89,10 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Check for backend changes
-        id: changes
-        env:
-          BEFORE: ${{ github.event.before }}
-        run: |
-          if git cat-file -e "$BEFORE^{commit}" 2>/dev/null && git diff --quiet "$BEFORE" "$GITHUB_SHA" -- backend; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "No backend changes; skipping deploy."
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
-      # The deploy key can only run /home/ubuntu/deploy.sh on the server:
-      # pull main, restart the service, health-check, roll back on failure.
+      # The deploy key can only run /home/ubuntu/deploy.sh on the server (deploy/ec2-deploy.sh).
+      # It gets the exact commit tested above and itself decides whether backend/ changed since the
+      # last successful deploy, so a replaced or skipped run can't strand a backend change.
       - name: Deploy
-        if: steps.changes.outputs.changed == 'true'
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
@@ -114,4 +101,4 @@ jobs:
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          ssh -i ~/.ssh/deploy_key -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20 ubuntu@3.142.50.164
+          ssh -i ~/.ssh/deploy_key -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20 ubuntu@3.142.50.164 "deploy $GITHUB_SHA"
